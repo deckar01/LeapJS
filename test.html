@@ -3,7 +3,7 @@
 <script type="text/javascript">
 
 function myListener(frame){
-	document.getElementById("output").innerHTML = '<pre>' + str + '</pre>';
+	document.getElementById("output").innerHTML = '<pre>' + frame.toString() + '</pre>';
 }
 
 Leap.Controller.listeners.push(myListener);
