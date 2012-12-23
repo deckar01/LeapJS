@@ -1,0 +1,14 @@
+<html><body>
+<script src="Leap.js"></script>
+<script type="text/javascript">
+
+function myListener(frame){
+	document.getElementById("output").innerHTML = '<pre>' + str + '</pre>';
+}
+
+Leap.Controller.listeners.push(myListener);
+Leap.Init("ws://localhost:6437/");
+
+</script>
+<div id="output"></div>
+</body></html>
