@@ -10,77 +10,70 @@ var Leap = {
 
 	Version : "0.7.0a",
 	
-	Init : function(connection){
-
+	Controller : function(connection){
+	
+		this.frames = [];
+		
+		this.frame = function(index){
+			if(index == null) return this.frames[this.frames.length-1];
+			if(index < this.frames.length)
+				return this.frames[this.frames.length-index-1];
+		};
+		
+		this.listenerId = 0;
+		
+		this.getListenerId = function(){
+			var val = this.listenerId;
+			this.listenerId++;
+			return val;
+		};
+		
+		this.listeners = {};
+		
+		this.addListener = function(listener){
+			listener.id = this.getListenerId();
+			this.listeners[listener.id] = listener;
+		};
+		
+		this.removeListener = function(listener){
+			this.listeners[listener.id].onExit(this);
+			delete this.listeners[listener.id];
+		};
+		
 		// Support both the WebSocket and MozWebSocket objects
 		if ((typeof(WebSocket) == 'undefined') && (typeof(MozWebSocket) != 'undefined')) WebSocket = MozWebSocket;
 		
 		//Create and open the socket
-		Leap.Socket = new WebSocket(connection);
+		this.Socket = new WebSocket(connection);
+		this.Socket.controller = this;
 		
-		Leap.Socket.onmessage = function(event){
+		this.Socket.onmessage = function(event){
 			
 			var eventData = JSON.parse(event.data);
 			
 			if(eventData.state=="frame"){
-			
 				var newFrame = new Leap.Frame(eventData.frame);
-				Leap.Controller.frames.push(newFrame);
-				
-				for(index in Leap.Controller.listeners)
-					Leap.Controller.listeners[index].onFrame(Leap.Controller);
+				this.controller.frames.push(newFrame);
+				for(index in this.controller.listeners)
+					this.controller.listeners[index].onFrame(this.controller);
 			}
 		};
 		
-		Leap.Socket.onopen = function(event){
-			
-			for(index in Leap.Controller.listeners)
-				Leap.Controller.listeners[index].onConnect(Leap.Controller);
+		this.Socket.onopen = function(event){
+			for(index in this.controller.listeners)
+				this.controller.listeners[index].onConnect(this.controller);
 		};
 		
-		Leap.Socket.onclose = function(event){
-			
-			for(index in Leap.Controller.listeners)
-				Leap.Controller.listeners[index].onDisconnect(Leap.Controller);
+		this.Socket.onclose = function(event){
+			for(index in this.controller.listeners)
+				this.controller.listeners[index].onDisconnect(this.controller);
 		};
 		
-		Leap.Socket.onerror = function(event){ alert("Connection error"); };
-	},
-	
-	Controller : {
-	
-		frames : [],
-		
-		frame : function(index){
-			if(index == null) return Leap.Controller.frames[Leap.Controller.frames.length-1];
-			if(index < Leap.Controller.frames.length)
-				return Leap.Controller.frames[Leap.Controller.frames.length-index-1];
-		},
-		
-		listenerId : 0,
-		
-		getListenerId : function(){
-			var val = Leap.Controller.listenerId;
-			Leap.Controller.listenerId++;
-			return val;
-		},
-		
-		listeners: {},
-		
-		addListener: function(listener){
-			Leap.Controller.listeners[listener.id] = listener;
-		},
-		
-		removeListener: function(listener){
-			Leap.Controller.listeners[listener.id].onExit(Leap.Controller);
-			delete Leap.Controller.listeners[listener.id];
-		}
+		this.Socket.onerror = function(event){ alert("Connection error"); };
 	},
 	
 	Listener : function(){
-		
-		this.id = Leap.Controller.getListenerId();
-		
+	
 		this.onConnect = function(controller){};
 		this.onDisconnect = function(controller){};
 		this.onExit = function(controller){};
@@ -91,24 +84,22 @@ var Leap = {
 
 	Frame : function(frameData){
 		
+		this.id = frameData.id; // Int32
+		this.timestamp = frameData.timestamp; // Int64
+		
 		this.fingers = {}; // FingerList
 		this.tools = {}; // ToolList
 		this.pointables = {}; // PointableList
-		
 		this.hands = {}; // HandList
-		for(index in frameData.hands){
 		
+		for(index in frameData.hands){
 			var newHand = new Leap.Hand(frameData.hands[index],this)
 			this.hands[newHand.id] = newHand;
-			
 			for(f in newHand.fingers)
 				this.pointables[newHand.fingers[f].id] = this.fingers[newHand.fingers[f].id] = newHand.fingers[f];
 			for(t in newHand.tools)
 				this.pointables[newHand.tools[t].id] = this.tools[newHand.tools[t].id] = newHand.tools[t];
 		}
-		
-		this.id = frameData.id; // Int32
-		this.timestamp = frameData.timestamp; // Int64
 		
 		this.toString = function(){
 			var val = "{timestamp:"+this.timestamp+",id:"+this.id+",hands:[";
@@ -123,14 +114,17 @@ var Leap = {
 			if(this.fingers[id]==null) return {isValid:false};
 			return this.fingers[id];
 		}
+		
 		this.hand = function(id){ // Hand hand(id)
 			if(this.hands[id]==null) return {isValid:false};
 			return this.hands[id];
 		}
+		
 		this.pointable = function(id){ // Pointable pointable(id)
 			if(this.pointables[id]==null) return {isValid:false};
 			return this.pointables[id];
 		}
+		
 		this.tool = function(id){ // Tool tool(id)
 			if(this.tools[id]==null) return {isValid:false};
 			return this.tools[id];
@@ -190,10 +184,12 @@ var Leap = {
 			if(this.fingers[id]==null) return {isValid:false};
 			return this.fingers[id];
 		}
+		
 		this.pointable = function(id){ // Pointable pointable(id)
 			if(this.pointables[id]==null) return {isValid:false};
 			return this.pointables[id];
 		}
+		
 		this.tool = function(id){ // Tool tool(id)
 			if(this.tools[id]==null) return {isValid:false};
 			return this.tools[id];
@@ -207,7 +203,6 @@ var Leap = {
 		
 		this.isFinger = true; // Bool
 		this.isTool = false; // Bool
-		this.isValid = true; // Bool
 	},
 
 	Tool : function(toolData, parentHand){
@@ -217,7 +212,6 @@ var Leap = {
 		
 		this.isFinger = false; // Bool
 		this.isTool = true; // Bool
-		this.isValid = true; // Bool
 	},
 
 	Pointable : function(pointableData, parentHand){
@@ -320,6 +314,7 @@ var Leap = {
 	},
 	
 	vectors : {
+	
 		backward: function(){ return new Leap.Vector({x:0,y:0,z:1}); },
 		down: function(){ return new Leap.Vector({x:0,y:-1,z:0}); },
 		forward: function(){ return new Leap.Vector({x:0,y:0,z:-1}); },
