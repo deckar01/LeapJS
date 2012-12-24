@@ -4,8 +4,8 @@
 <script type="text/javascript">
 
 myListener = new Leap.Listener();
-myListener.onFrame = function(){
-	document.getElementById("output").innerHTML = '<pre>' + Leap.Controller.frame(0).toString() + '</pre>';
+myListener.onFrame = function(controller){
+	document.getElementById("output").innerHTML = '<pre>' + controller.frame().toString() + '</pre>';
 }
 
 Leap.Controller.addListener(myListener);
