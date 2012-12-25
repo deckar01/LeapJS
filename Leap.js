@@ -8,7 +8,7 @@
 
 var Leap = {
 
-	Version : "0.7.0a",
+	Version : "0.7.0",
 	
 	Controller : function(connection){
 	
@@ -50,13 +50,10 @@ var Leap = {
 		this.Socket.onmessage = function(event){
 			
 			var eventData = JSON.parse(event.data);
-			
-			if(eventData.state=="frame"){
-				var newFrame = new Leap.Frame(eventData.frame);
-				this.controller.frames.push(newFrame);
-				for(index in this.controller.listeners)
-					this.controller.listeners[index].onFrame(this.controller);
-			}
+			var newFrame = new Leap.Frame(eventData);
+			this.controller.frames.push(newFrame);
+			for(index in this.controller.listeners)
+				this.controller.listeners[index].onFrame(this.controller);
 		};
 		
 		this.Socket.onopen = function(event){
@@ -141,7 +138,7 @@ var Leap = {
 		this.pointables = {}; // PointableList
 		
 		for(index in handData.fingers){
-			if(handData.fingers[index].isTool == false){
+			if(handData.fingers[index].tool == false){
 				var newFinger = new Leap.Finger(handData.fingers[index],this);
 				this.pointables[newFinger.id] = this.fingers[newFinger.id] = newFinger;
 			}
@@ -151,18 +148,15 @@ var Leap = {
 			}
 		}
 		
-		if(handData.normal != null) this.direction = new Leap.Vector(handData.normal); // Vector
-		
 		if(handData.palm != null){
-			this.palmNormal = new Leap.Vector(handData.palm.direction); // Vector
+			this.direction = new Leap.Vector(handData.palm.direction); // Vector
+			this.palmNormal = new Leap.Vector(handData.palm.normal); // Vector
 			this.palmPosition = new Leap.Vector(handData.palm.position); // Vector
-		}
-		
-		if(handData.velocity != null) this.palmVelocity = new Leap.Vector(handData.velocity); // Vector
-		
-		if(handData.ball != null){
-			this.sphereCenter = new Leap.Vector(handData.ball.position); // Vector
-			this.sphereRadius = handData.ball.radius; // Float
+			this.palmVelocity = new Leap.Vector(handData.palm.velocity); // Vector
+			if(handData.palm.ball != null){
+				this.sphereCenter = new Leap.Vector(handData.palm.ball.center); // Vector
+				this.sphereRadius = handData.palm.ball.radius; // Float
+			}
 		}
 		
 		this.toString = function(){
@@ -222,7 +216,7 @@ var Leap = {
 		
 		this.direction = new Leap.Vector(pointableData.tip.direction); // Vector direction
 		this.tipPosition = new Leap.Vector(pointableData.tip.position); // Vector
-		this.tipVelocity = new Leap.Vector(pointableData.velocity); // Vector
+		this.tipVelocity = new Leap.Vector(pointableData.tip.velocity); // Vector
 		
 		this.length = pointableData.length; // Float
 		this.width = pointableData.width; // Float
@@ -240,9 +234,9 @@ var Leap = {
 
 	Vector : function(coordinates){
 		
-		this.x = coordinates.x; // Float
-		this.y = coordinates.y; // Float
-		this.z = coordinates.z; // Float
+		this.x = coordinates[0]; // Float
+		this.y = coordinates[1]; // Float
+		this.z = coordinates[2]; // Float
 		
 		this.angleTo = function(other){ // Float
 			var cos = this.dot(other)/(this.magnitude()*other.magnitude());

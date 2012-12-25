@@ -11,7 +11,7 @@ myListener.onFrame = function(controller){
 myController = new Leap.Controller("ws://localhost:6437/");
 myController.addListener(myListener);
 
-var test = {data:'{"state": "frame", "frame": {"timestamp": 9882682931, "id": 165698, "hands": [{"ball": null, "normal": null, "fingers": [{"isTool": false, "tip": {"position": {"y": 154.1214767735723, "x": -125.13877764068172, "z": 132.85594472493156}, "direction": {"y": -0.6711236338564605, "x": 0.5618199627872327, "z": 0.4836852256303186}}, "width": 15.638955949441504, "length": 27.8386276928604, "velocity": {"y": -96.81510565945706, "x": -242.2883560649902, "z": -39.321123757279615}, "id": 3}], "palm": null, "velocity": null, "id": 2}, {"ball": {"position": {"y": 115.17245521706913, "x": -85.08373666422489, "z": 111.00109998309735}, "radius": 59.384257627179345}, "normal": {"y": -0.9549172586029548, "x": -0.23738056930124873, "z": 0.14776843701111483}, "fingers": [], "palm": {"position": {"y": 146.8133383929836, "x": -74.15271296723914, "z": 107.90227778788531}, "direction": {"y": -0.05798963564295134, "x": 0.5001857930238666, "z": 0.8560750778525202}}, "velocity": {"y": 469.95559873690337, "x": 187.68467452691146, "z": -452.1454697320665}, "id": 1}]}}'};
+var test = {data:'{"hands":[{"fingers":[{"id":3,"length":161.527,"tip":{"direction":[-0.451575,-0.288679,-0.844242],"position":[-21.2008,218.338,66.4064],"velocity":[-39.5577,393.767,-36.8733]},"tool":true,"width":15.4255}],"id":1,"palm":{"ball":{"center":[45.1826,250.019,85.1284],"radius":110.118},"direction":[-0.596952,-0.248574,-0.755141],"normal":[-0.238045,-0.858259,0.453871],"position":[51.0557,242.365,149.058],"velocity":[-87.7828,219.03,-113.643]}}],"id":1350444,"timestamp":4447274226}'};
 myController.Socket.onmessage(test);
 
 </script>
