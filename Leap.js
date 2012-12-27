@@ -273,9 +273,9 @@ Leap.Vector.prototype = {
 	},
 	
 	cross : function(other){ // Vector cross(Vector other)
-		var x = this.y*other.z-other.y-this.z;
-		var y = this.x*other.z-other.x-this.z;
-		var z = this.x*other.y-other.x-this.y;
+		var x = this.y*other.z-other.y*this.z;
+		var y = this.x*other.z-other.x*this.z;
+		var z = this.x*other.y-other.x*this.y;
 		return new Leap.Vector([x,y,z]);
 	},
 	
