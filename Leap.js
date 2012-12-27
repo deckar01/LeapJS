@@ -144,20 +144,6 @@ var Leap = {
 		this.x = coordinates[0]; // Float
 		this.y = coordinates[1]; // Float
 		this.z = coordinates[2]; // Float
-	},
-	
-	vectors : {
-	
-		backward: function(){ return new Leap.Vector([0,0,1]); },
-		down: function(){ return new Leap.Vector([0,-1,0]); },
-		forward: function(){ return new Leap.Vector([0,0,-1]); },
-		left: function(){ return new Leap.Vector([-1,0,0]); },
-		right: function(){ return new Leap.Vector([1,0,0]); },
-		up: function(){ return new Leap.Vector([0,1,0]); },
-		xAxis: function(){ return new Leap.Vector([1,0,0]); },
-		yAxis: function(){ return new Leap.Vector([0,1,0]); },
-		zAxis: function(){ return new Leap.Vector([0,0,1]); },
-		zero: function(){ return new Leap.Vector([0,0,0]); }
 	}
 }
 
@@ -348,3 +334,14 @@ Leap.Vector.prototype = {
 		return "{x:"+this.x+",y:"+this.y+",z:"+this.z+"}";
 	}
 }
+
+Leap.Vector.backward = function(){ return new Leap.Vector([0,0,1]); };
+Leap.Vector.down = function(){ return new Leap.Vector([0,-1,0]); };
+Leap.Vector.forward = function(){ return new Leap.Vector([0,0,-1]); };
+Leap.Vector.left = function(){ return new Leap.Vector([-1,0,0]); };
+Leap.Vector.right = function(){ return new Leap.Vector([1,0,0]); };
+Leap.Vector.up = function(){ return new Leap.Vector([0,1,0]); };
+Leap.Vector.xAxis = function(){ return new Leap.Vector([1,0,0]); };
+Leap.Vector.yAxis = function(){ return new Leap.Vector([0,1,0]); };
+Leap.Vector.zAxis = function(){ return new Leap.Vector([0,0,1]); };
+Leap.Vector.zero = function(){ return new Leap.Vector([0,0,0]); };
