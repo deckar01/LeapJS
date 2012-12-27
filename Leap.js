@@ -14,31 +14,9 @@ var Leap = {
 	
 		this.frames = [];
 		
-		this.frame = function(index){
-			if(index == null) return this.frames[this.frames.length-1];
-			if(index < this.frames.length)
-				return this.frames[this.frames.length-index-1];
-		};
-		
 		this.listenerId = 0;
 		
-		this.getListenerId = function(){
-			var val = this.listenerId;
-			this.listenerId++;
-			return val;
-		};
-		
 		this.listeners = {};
-		
-		this.addListener = function(listener){
-			listener.id = this.getListenerId();
-			this.listeners[listener.id] = listener;
-		};
-		
-		this.removeListener = function(listener){
-			this.listeners[listener.id].onExit(this);
-			delete this.listeners[listener.id];
-		};
 		
 		// Support both the WebSocket and MozWebSocket objects
 		if ((typeof(WebSocket) == 'undefined') && (typeof(MozWebSocket) != 'undefined')) WebSocket = MozWebSocket;
@@ -97,35 +75,6 @@ var Leap = {
 			for(t in newHand.tools)
 				this.pointables[newHand.tools[t].id] = this.tools[newHand.tools[t].id] = newHand.tools[t];
 		}
-		
-		this.toString = function(){
-			var val = "{timestamp:"+this.timestamp+",id:"+this.id+",hands:[";
-			for(index in this.hands) val += this.hands[index].toString();
-			val += "]}";
-			return val;
-		};
-		
-		this.isValid = true; // Bool
-		
-		this.finger = function(id){ // Finger finger(Int32 id)
-			if(this.fingers[id]==null) return {isValid:false};
-			return this.fingers[id];
-		}
-		
-		this.hand = function(id){ // Hand hand(id)
-			if(this.hands[id]==null) return {isValid:false};
-			return this.hands[id];
-		}
-		
-		this.pointable = function(id){ // Pointable pointable(id)
-			if(this.pointables[id]==null) return {isValid:false};
-			return this.pointables[id];
-		}
-		
-		this.tool = function(id){ // Tool tool(id)
-			if(this.tools[id]==null) return {isValid:false};
-			return this.tools[id];
-		}
 	},
 
 	Hand : function(handData, parentFrame){
@@ -158,42 +107,11 @@ var Leap = {
 				this.sphereRadius = handData.palm.ball.radius; // Float
 			}
 		}
-		
-		this.toString = function(){
-			var val = "{id:"+this.id+",sphereCenter:"+(this.sphereCenter==null?"null":this.sphereCenter)+",";
-			val += "sphereRadius:"+(this.sphereRadius==null?"null":this.sphereRadius)+",";
-			val += "normal:"+(this.normal==undefined?"null":this.normal.toString())+",fingers:[";
-			for(index in this.fingers) val += this.fingers[index].toString();
-			val += "],tools:[";
-			for(index in this.tools) val += this.tools[index].toString();
-			val += "],palmNormal:"+(this.palmNormal==undefined?"null":this.palmNormal.toString())+",";
-			val += "palmPosition:"+(this.palmPosition==undefined?"null":this.palmPosition.toString())+",";
-			val += "palmVelocity:"+(this.palmVelocity==undefined?"null":this.palmVelocity.toString())+"}";
-			return val;
-		};
-		
-		this.isValid = true; // Bool
-		
-		this.finger = function(id){ // Finger finger(Int32 id)
-			if(this.fingers[id]==null) return {isValid:false};
-			return this.fingers[id];
-		}
-		
-		this.pointable = function(id){ // Pointable pointable(id)
-			if(this.pointables[id]==null) return {isValid:false};
-			return this.pointables[id];
-		}
-		
-		this.tool = function(id){ // Tool tool(id)
-			if(this.tools[id]==null) return {isValid:false};
-			return this.tools[id];
-		}
 	},
 
 	Finger : function(fingerData, parentHand){
 	
-		var pointable = new Leap.Pointable(fingerData,parentHand);
-		for(index in pointable) this[index] = pointable[index];
+		Leap.Pointable(this,fingerData,parentHand);
 		
 		this.isFinger = true; // Bool
 		this.isTool = false; // Bool
@@ -201,35 +119,24 @@ var Leap = {
 
 	Tool : function(toolData, parentHand){
 		
-		var pointable = new Leap.Pointable(toolData,parentHand);
-		for(index in pointable) this[index] = pointable[index];
+		Leap.Pointable(this,toolData,parentHand);
 		
 		this.isFinger = false; // Bool
 		this.isTool = true; // Bool
 	},
 
-	Pointable : function(pointableData, parentHand){
+	Pointable : function(obj, pointableData, parentHand){
 		
-		this.frame = parentHand.frame; // Frame
-		this.hand = parentHand; // Hand
-		this.id = pointableData.id; // Int32
+		obj.frame = parentHand.frame; // Frame
+		obj.hand = parentHand; // Hand
+		obj.id = pointableData.id; // Int32
 		
-		this.direction = new Leap.Vector(pointableData.tip.direction); // Vector direction
-		this.tipPosition = new Leap.Vector(pointableData.tip.position); // Vector
-		this.tipVelocity = new Leap.Vector(pointableData.tip.velocity); // Vector
+		obj.direction = new Leap.Vector(pointableData.tip.direction); // Vector direction
+		obj.tipPosition = new Leap.Vector(pointableData.tip.position); // Vector
+		obj.tipVelocity = new Leap.Vector(pointableData.tip.velocity); // Vector
 		
-		this.length = pointableData.length; // Float
-		this.width = pointableData.width; // Float
-		
-		this.isValid = true; // Bool
-		this.toString = function(){
-			var val = "{id:"+this.id+",direction:"+this.direction.toString()+",";
-			val += "tipPosition:"+this.tipPosition.toString()+",";
-			val += "tipVelocity:"+this.tipVelocity.toString()+",";
-			val += "length:"+this.length+",";
-			val += "width:"+this.width+"}";
-			return val;
-		};
+		obj.length = pointableData.length; // Float
+		obj.width = pointableData.width; // Float
 	},
 
 	Vector : function(coordinates){
@@ -237,87 +144,207 @@ var Leap = {
 		this.x = coordinates[0]; // Float
 		this.y = coordinates[1]; // Float
 		this.z = coordinates[2]; // Float
-		
-		this.angleTo = function(other){ // Float
-			var cos = this.dot(other)/(this.magnitude()*other.magnitude());
-			return Math.acos(cos);
-		};
-		
-		this.cross = function(other){ // Vector cross(Vector other)
-			var x = this.y*other.z-other.y-this.z;
-			var y = this.x*other.z-other.x-this.z;
-			var z = this.x*other.y-other.x-this.y;
-			return new Leap.Vector({x:x,y:y,z:z});
-		};
-		
-		this.distanceTo = function(other){ // Float distanceTo(Vector other)
-			return this.minus(other).magnitude();
-		};
-		
-		this.dot = function(other){ // Float dot(Vector other)
-			return this.x*other.x+this.y*other.y+this.z*other.z;
-		};
-		
-		this.plus = function(other){ // Vector plus(Vector other)
-			return new Leap.Vector({x:this.x+other.x,y:this.y+other.y,z:this.z+other.z});
-		};
-		
-		this.minus = function(other){ // Vector minus(Vector other)
-			return new Leap.Vector({x:this.x-other.x,y:this.y-other.y,z:this.z-other.z});
-		};
-		
-		this.multiply = function(scalar){ // Vector multiply(Float scalar)
-			return new Leap.Vector({x:this.x*scalar,y:this.y*scalar,z:this.z*scalar});
-		};
-		
-		this.dividedBy = function(scalar){ // Vector dividedBy(Float scalar)
-			return new Leap.Vector({x:this.x/scalar,y:this.y/scalar,z:this.z/scalar});
-		};
-		
-		this.magnitude = function(){ // Float
-			return Math.sqrt(this.magnitudeSquared());
-		};
-		
-		this.magnitudeSquared = function(){ // Float
-			return Math.pow(this.x,2)+Math.pow(this.y,2)+Math.pow(this.y,2);
-		};
-		
-		this.normalized = function(){ // Vector
-			return this.dividedBy(this.magnitude());
-		};
-		
-		this.pitch = function(){ // Float
-			var proj = new Leap.Vector({x:0,y:this.y,z:this.z});
-			return Leap.vectors.forward().angleTo(proj);
-		};
-		
-		this.roll = function(){ // Float
-			var proj = new Leap.Vector({x:this.x,y:this.y,z:0});
-			return Leap.vectors.down().angleTo(proj);
-		};
-		
-		this.yaw = function(){ // Float
-			var proj = new Leap.Vector({x:this.x,y:0,z:this.z});
-			return Leap.vectors.forward().angleTo(proj);
-		};
-		
-		this.toString = function(){
-			return "{x:"+this.x+",y:"+this.y+",z:"+this.z+"}";
-		}
-		
 	},
 	
 	vectors : {
 	
-		backward: function(){ return new Leap.Vector({x:0,y:0,z:1}); },
-		down: function(){ return new Leap.Vector({x:0,y:-1,z:0}); },
-		forward: function(){ return new Leap.Vector({x:0,y:0,z:-1}); },
-		left: function(){ return new Leap.Vector({x:-1,y:0,z:0}); },
-		right: function(){ return new Leap.Vector({x:1,y:0,z:0}); },
-		up: function(){ return new Leap.Vector({x:0,y:1,z:0}); },
-		xAxis: function(){ return new Leap.Vector({x:1,y:0,z:0}); },
-		yAxis: function(){ return new Leap.Vector({x:0,y:1,z:0}); },
-		zAxis: function(){ return new Leap.Vector({x:0,y:0,z:1}); },
-		zero: function(){ return new Leap.Vector({x:0,y:0,z:0}); }
+		backward: function(){ return new Leap.Vector([0,0,1]); },
+		down: function(){ return new Leap.Vector([0,-1,0]); },
+		forward: function(){ return new Leap.Vector([0,0,-1]); },
+		left: function(){ return new Leap.Vector([-1,0,0]); },
+		right: function(){ return new Leap.Vector([1,0,0]); },
+		up: function(){ return new Leap.Vector([0,1,0]); },
+		xAxis: function(){ return new Leap.Vector([1,0,0]); },
+		yAxis: function(){ return new Leap.Vector([0,1,0]); },
+		zAxis: function(){ return new Leap.Vector([0,0,1]); },
+		zero: function(){ return new Leap.Vector([0,0,0]); }
+	}
+}
+
+Leap.Controller.prototype = {
+	
+	frame : function(index){
+		if(index == null) return this.frames[this.frames.length-1];
+		if(index < this.frames.length)
+			return this.frames[this.frames.length-index-1];
 	},
+	
+	getListenerId : function(){
+		var val = this.listenerId;
+		this.listenerId++;
+		return val;
+	},
+	
+	addListener : function(listener){
+		listener.id = this.getListenerId();
+		this.listeners[listener.id] = listener;
+	},
+	
+	removeListener : function(listener){
+		this.listeners[listener.id].onExit(this);
+		delete this.listeners[listener.id];
+	}
+}
+
+Leap.Frame.prototype = {
+	
+	toString : function(){
+		var val = "{timestamp:"+this.timestamp+",id:"+this.id+",hands:[";
+		for(index in this.hands) val += this.hands[index].toString();
+		val += "]}";
+		return val;
+	},
+	
+	isValid : true, // Bool
+	
+	finger : function(id){ // Finger finger(Int32 id)
+		if(this.fingers[id]==null) return {isValid:false};
+		return this.fingers[id];
+	},
+	
+	hand : function(id){ // Hand hand(id)
+		if(this.hands[id]==null) return {isValid:false};
+		return this.hands[id];
+	},
+	
+	pointable : function(id){ // Pointable pointable(id)
+		if(this.pointables[id]==null) return {isValid:false};
+		return this.pointables[id];
+	},
+	
+	tool : function(id){ // Tool tool(id)
+		if(this.tools[id]==null) return {isValid:false};
+		return this.tools[id];
+	}
+}
+
+Leap.Hand.prototype = {
+	
+	toString : function(){
+		var val = "{id:"+this.id+",sphereCenter:"+(this.sphereCenter==null?"null":this.sphereCenter)+",";
+		val += "sphereRadius:"+(this.sphereRadius==null?"null":this.sphereRadius)+",";
+		val += "normal:"+(this.normal==undefined?"null":this.normal.toString())+",fingers:[";
+		for(index in this.fingers) val += this.fingers[index].toString();
+		val += "],tools:[";
+		for(index in this.tools) val += this.tools[index].toString();
+		val += "],palmNormal:"+(this.palmNormal==undefined?"null":this.palmNormal.toString())+",";
+		val += "palmPosition:"+(this.palmPosition==undefined?"null":this.palmPosition.toString())+",";
+		val += "palmVelocity:"+(this.palmVelocity==undefined?"null":this.palmVelocity.toString())+"}";
+		return val;
+	},
+	
+	isValid : true, // Bool
+	
+	finger : function(id){ // Finger finger(Int32 id)
+		if(this.fingers[id]==null) return {isValid:false};
+		return this.fingers[id];
+	},
+	
+	pointable : function(id){ // Pointable pointable(id)
+		if(this.pointables[id]==null) return {isValid:false};
+		return this.pointables[id];
+	},
+	
+	tool : function(id){ // Tool tool(id)
+		if(this.tools[id]==null) return {isValid:false};
+		return this.tools[id];
+	}
+}
+
+Leap.Finger.prototype = {
+	
+	isValid : true, // Bool
+	
+	toString : function(){
+		var val = "{id:"+this.id+",direction:"+this.direction.toString()+",";
+		val += "tipPosition:"+this.tipPosition.toString()+",";
+		val += "tipVelocity:"+this.tipVelocity.toString()+",";
+		val += "length:"+this.length+",";
+		val += "width:"+this.width+"}";
+		return val;
+	}
+}
+
+Leap.Tool.prototype = {
+	
+	isValid : true, // Bool
+	
+	toString : function(){
+		var val = "{id:"+this.id+",direction:"+this.direction.toString()+",";
+		val += "tipPosition:"+this.tipPosition.toString()+",";
+		val += "tipVelocity:"+this.tipVelocity.toString()+",";
+		val += "length:"+this.length+",";
+		val += "width:"+this.width+"}";
+		return val;
+	}
+}
+
+Leap.Vector.prototype = {
+	
+	angleTo : function(other){ // Float
+		var cos = this.dot(other)/(this.magnitude()*other.magnitude());
+		return Math.acos(cos);
+	},
+	
+	cross : function(other){ // Vector cross(Vector other)
+		var x = this.y*other.z-other.y-this.z;
+		var y = this.x*other.z-other.x-this.z;
+		var z = this.x*other.y-other.x-this.y;
+		return new Leap.Vector([x,y,z]);
+	},
+	
+	distanceTo : function(other){ // Float distanceTo(Vector other)
+		return this.minus(other).magnitude();
+	},
+	
+	dot : function(other){ // Float dot(Vector other)
+		return this.x*other.x+this.y*other.y+this.z*other.z;
+	},
+	
+	plus : function(other){ // Vector plus(Vector other)
+		return new Leap.Vector([this.x+other.x,this.y+other.y,this.z+other.z]);
+	},
+	
+	minus : function(other){ // Vector minus(Vector other)
+		return new Leap.Vector([this.x-other.x,this.y-other.y,this.z-other.z]);
+	},
+	
+	multiply : function(scalar){ // Vector multiply(Float scalar)
+		return new Leap.Vector([this.x*scalar,this.y*scalar,this.z*scalar]);
+	},
+	
+	dividedBy : function(scalar){ // Vector dividedBy(Float scalar)
+		return new Leap.Vector([this.x/scalar,this.y/scalar,this.z/scalar]);
+	},
+	
+	magnitude : function(){ // Float
+		return Math.sqrt(this.magnitudeSquared());
+	},
+	
+	magnitudeSquared : function(){ // Float
+		return Math.pow(this.x,2)+Math.pow(this.y,2)+Math.pow(this.y,2);
+	},
+	
+	normalized : function(){ // Vector
+		return this.dividedBy(this.magnitude());
+	},
+	
+	pitch : function(){ // Float
+		var proj = new Leap.Vector([0,this.y,this.z]);
+		return Leap.vectors.forward().angleTo(proj);
+	},
+	
+	roll : function(){ // Float
+		var proj = new Leap.Vector([this.x,this.y,0]);
+		return Leap.vectors.down().angleTo(proj);
+	},
+	
+	yaw : function(){ // Float
+		var proj = new Leap.Vector([this.x,0,this.z]);
+		return Leap.vectors.forward().angleTo(proj);
+	},
+	
+	toString : function(){
+		return "{x:"+this.x+",y:"+this.y+",z:"+this.z+"}";
+	}
 }

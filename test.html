@@ -1,18 +1,34 @@
 <html><body>
 <script src="Leap.js"></script>
+<script src="testdata.js"></script>
 <div id="output"></div>
 <script type="text/javascript">
 
 myListener = new Leap.Listener();
 myListener.onFrame = function(controller){
-	document.getElementById("output").innerHTML = '<pre>' + controller.frame().toString() + '</pre>';
+	//document.getElementById("output").innerHTML += '<pre>' + controller.frame().toString() + '</pre>';
 }
+
+var start = new Date().getTime();
 
 myController = new Leap.Controller("ws://localhost:6437/");
 myController.addListener(myListener);
 
-var test = {data:'{"hands":[{"fingers":[{"id":3,"length":161.527,"tip":{"direction":[-0.451575,-0.288679,-0.844242],"position":[-21.2008,218.338,66.4064],"velocity":[-39.5577,393.767,-36.8733]},"tool":true,"width":15.4255}],"id":1,"palm":{"ball":{"center":[45.1826,250.019,85.1284],"radius":110.118},"direction":[-0.596952,-0.248574,-0.755141],"normal":[-0.238045,-0.858259,0.453871],"position":[51.0557,242.365,149.058],"velocity":[-87.7828,219.03,-113.643]}}],"id":1350444,"timestamp":4447274226}'};
-myController.Socket.onmessage(test);
+var end = new Date().getTime();
+document.getElementById("output").innerHTML += "Setup time: ~" + (end-start) + "ms<br/>";
+
+document.getElementById("output").innerHTML += "Loading test data...<br/>";
+
+start = new Date().getTime();
+for(index in test){
+	
+	myController.Socket.onmessage(test[index]);
+	//document.getElementById("output").innerHTML += "Frame load: ~" + (end-start) + "ms<br/>";
+}
+end = new Date().getTime();
+
+document.getElementById("output").innerHTML += "Frame rate: ~" + Math.round(1000*test.length/(end-start)) + " fps<br/>";
+document.getElementById("output").innerHTML += "Avg frame time: ~" + Math.round(1000*(end-start)/test.length)/1000 + "ms<br/>";
 
 </script>
 </body></html>
