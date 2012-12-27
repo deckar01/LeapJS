@@ -18,33 +18,44 @@ var Leap = {
 		
 		this.listeners = {};
 		
-		// Support both the WebSocket and MozWebSocket objects
-		if ((typeof(WebSocket) == 'undefined') && (typeof(MozWebSocket) != 'undefined')) WebSocket = MozWebSocket;
-		
-		//Create and open the socket
-		this.Socket = new WebSocket(connection);
-		this.Socket.controller = this;
-		
-		this.Socket.onmessage = function(event){
+		this.onmessage = function(event){
 			
 			var eventData = JSON.parse(event.data);
 			var newFrame = new Leap.Frame(eventData);
-			this.controller.frames.push(newFrame);
-			for(index in this.controller.listeners)
-				this.controller.listeners[index].onFrame(this.controller);
+			this.frames.push(newFrame);
+			for(index in this.listeners)
+				this.listeners[index].onFrame(this);
 		};
 		
-		this.Socket.onopen = function(event){
-			for(index in this.controller.listeners)
-				this.controller.listeners[index].onConnect(this.controller);
-		};
+		this.connected = false;
 		
-		this.Socket.onclose = function(event){
-			for(index in this.controller.listeners)
-				this.controller.listeners[index].onDisconnect(this.controller);
-		};
+		if ((typeof(WebSocket) == 'undefined') && (typeof(MozWebSocket) != 'undefined')) WebSocket = MozWebSocket;
 		
-		this.Socket.onerror = function(event){ alert("Connection error"); };
+		if (typeof(WebSocket) != 'undefined'){
+			
+			this.Socket = new WebSocket(connection);
+			this.Socket.controller = this;
+			
+			this.Socket.onmessage = function(event){
+				this.controller.onmessage(event);
+			};
+			
+			this.Socket.onopen = function(event){
+				this.connected = true;
+				for(index in this.controller.listeners)
+					this.controller.listeners[index].onConnect(this.controller);
+			};
+			
+			this.Socket.onclose = function(event){
+				this.connected = false;
+				for(index in this.controller.listeners)
+					this.controller.listeners[index].onDisconnect(this.controller);
+			};
+			
+			this.Socket.onerror = function(event){ 
+				this.onclose(event);
+			};
+		}
 	},
 	
 	Listener : function(){
@@ -164,9 +175,11 @@ Leap.Controller.prototype = {
 	addListener : function(listener){
 		listener.id = this.getListenerId();
 		this.listeners[listener.id] = listener;
+		listener.onInit(this);
 	},
 	
 	removeListener : function(listener){
+		listener.onExit(this);
 		this.listeners[listener.id].onExit(this);
 		delete this.listeners[listener.id];
 	}

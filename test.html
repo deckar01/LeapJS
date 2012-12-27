@@ -1,3 +1,4 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html><body>
 <script src="Leap.js"></script>
 <script src="testdata.js"></script>
@@ -15,7 +16,7 @@ myController = new Leap.Controller("ws://localhost:6437/");
 document.getElementById("profile").innerHTML = "Profiling LeapJS performance...<br/>";
 
 start = new Date().getTime();
-for(index in test) myController.Socket.onmessage(test[index]);
+for(index in test) myController.onmessage(test[index]);
 end = new Date().getTime();
 
 document.getElementById("profile").innerHTML = "Frame rate: " + Math.round(1000*test.length/(end-start)) + " fps<br/>" +
