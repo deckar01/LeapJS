@@ -1,34 +1,27 @@
 <html><body>
 <script src="Leap.js"></script>
 <script src="testdata.js"></script>
+<div id="profile"></div>
 <div id="output"></div>
 <script type="text/javascript">
 
 myListener = new Leap.Listener();
 myListener.onFrame = function(controller){
-	//document.getElementById("output").innerHTML += '<pre>' + controller.frame().toString() + '</pre>';
+	document.getElementById("output").innerHTML = '<pre>' + controller.frame().toString() + '</pre>';
 }
-
-var start = new Date().getTime();
 
 myController = new Leap.Controller("ws://localhost:6437/");
-myController.addListener(myListener);
 
-var end = new Date().getTime();
-document.getElementById("output").innerHTML += "Setup time: ~" + (end-start) + "ms<br/>";
-
-document.getElementById("output").innerHTML += "Loading test data...<br/>";
+document.getElementById("profile").innerHTML = "Profiling LeapJS performance...<br/>";
 
 start = new Date().getTime();
-for(index in test){
-	
-	myController.Socket.onmessage(test[index]);
-	//document.getElementById("output").innerHTML += "Frame load: ~" + (end-start) + "ms<br/>";
-}
+for(index in test) myController.Socket.onmessage(test[index]);
 end = new Date().getTime();
 
-document.getElementById("output").innerHTML += "Frame rate: ~" + Math.round(1000*test.length/(end-start)) + " fps<br/>";
-document.getElementById("output").innerHTML += "Avg frame time: ~" + Math.round(1000*(end-start)/test.length)/1000 + "ms<br/>";
+document.getElementById("profile").innerHTML = "Frame rate: " + Math.round(1000*test.length/(end-start)) + " fps<br/>" +
+"Avg frame time: " + Math.round(1000*(end-start)/test.length)/1000 + " ms<br/>";
+
+myController.addListener(myListener);
 
 </script>
 </body></html>
