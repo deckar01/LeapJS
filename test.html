@@ -1,29 +1,37 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html><body>
-<script src="Leap.js"></script>
-<script src="testdata.js"></script>
-<b>LeapJS Performance Profile:</b>
-<div id="profile"></div>
-<div id="output"></div>
-<script type="text/javascript">
+<html>
+	<body>
+		<script src="Leap.js"></script>
+		<script src="testdata.js"></script>
+		
+		<b>LeapJS Performance Profile:</b>
+		<div id="profile"></div>
+		
+		<div id="output"></div>
+		
+		<script type="text/javascript">
+			
+			// Create a listener that will print frame data when a new frame arrives
+			myListener = new Leap.Listener();
+			myListener.onFrame = function(controller){
+				document.getElementById("output").innerHTML = '<pre>' + controller.frame().toString() + '</pre>';
+			}
+			
+			// Create a controller to connect to the Leap Motion
+			myController = new Leap.Controller("ws://localhost:6437/");
 
-myListener = new Leap.Listener();
-myListener.onFrame = function(controller){
-	document.getElementById("output").innerHTML = '<pre>' + controller.frame().toString() + '</pre>';
-}
+			// The following code is for performance profiling only
+			document.getElementById("profile").innerHTML = "Profiling LeapJS performance...<br/>";
+			start = new Date().getTime();
+			for(index in test) myController.onmessage(test[index]);
+			end = new Date().getTime();
+			document.getElementById("profile").innerHTML = "Frame rate: " + Math.round(1000*test.length/(end-start)) + " fps<br/>" +
+			"Avg frame time: " + Math.round(1000*(end-start)/test.length)/1000 + " ms<br/>";
+			// The previous code was for performance profiling only
+			
+			// Add the listener to the controller
+			myController.addListener(myListener);
 
-myController = new Leap.Controller("ws://localhost:6437/");
-
-// The following code is for performance profiling only
-document.getElementById("profile").innerHTML = "Profiling LeapJS performance...<br/>";
-start = new Date().getTime();
-for(index in test) myController.onmessage(test[index]);
-end = new Date().getTime();
-document.getElementById("profile").innerHTML = "Frame rate: " + Math.round(1000*test.length/(end-start)) + " fps<br/>" +
-"Avg frame time: " + Math.round(1000*(end-start)/test.length)/1000 + " ms<br/>";
-// The previous code was for performance profiling only
-
-myController.addListener(myListener);
-
-</script>
-</body></html>
+		</script>
+	</body>
+</html>
