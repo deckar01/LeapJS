@@ -70,59 +70,106 @@ var Leap = {
 
 	Frame : function(frameData){
 		
-		this.id = frameData.id; // Int32
-		this.timestamp = frameData.timestamp; // Int64
-		
-		this.fingers = {}; // FingerList
-		this.tools = {}; // ToolList
-		this.pointables = {}; // PointableList
-		this.hands = {}; // HandList
-		
-		for(index in frameData.hands){
-			var newHand = new Leap.Hand(frameData.hands[index],this)
-			this.hands[newHand.id] = newHand;
-			for(f in newHand.fingers)
-				this.pointables[newHand.fingers[f].id] = this.fingers[newHand.fingers[f].id] = newHand.fingers[f];
-			for(t in newHand.tools)
-				this.pointables[newHand.tools[t].id] = this.tools[newHand.tools[t].id] = newHand.tools[t];
+		if(frameData instanceof Leap.Frame){
+			this.id = frameData.id; // Int32
+			this.timestamp = frameData.timestamp; // Int64
+			
+			this.fingers = {}; // FingerList
+			this.tools = {}; // ToolList
+			this.pointables = {}; // PointableList
+			this.hands = {}; // HandList
+			
+			for(index in frameData.hands){
+				var newHand = new Leap.Hand(frameData.hands[index])
+				this.hands[newHand.id] = newHand;
+				for(f in newHand.fingers)
+					this.pointables[newHand.fingers[f].id] = this.fingers[newHand.fingers[f].id] = newHand.fingers[f];
+				for(t in newHand.tools)
+					this.pointables[newHand.tools[t].id] = this.tools[newHand.tools[t].id] = newHand.tools[t];
+			}
+		}
+		else{
+			this.id = frameData.id; // Int32
+			this.timestamp = frameData.timestamp; // Int64
+			
+			this.fingers = {}; // FingerList
+			this.tools = {}; // ToolList
+			this.pointables = {}; // PointableList
+			this.hands = {}; // HandList
+			
+			for(index in frameData.hands){
+				var newHand = new Leap.Hand(frameData.hands[index],this)
+				this.hands[newHand.id] = newHand;
+				for(f in newHand.fingers)
+					this.pointables[newHand.fingers[f].id] = this.fingers[newHand.fingers[f].id] = newHand.fingers[f];
+				for(t in newHand.tools)
+					this.pointables[newHand.tools[t].id] = this.tools[newHand.tools[t].id] = newHand.tools[t];
+			}
 		}
 	},
 
 	Hand : function(handData, parentFrame){
 		
-		this.frame = parentFrame; // Frame
-		this.id = handData.id; // Int32
-		
-		this.fingers = {}; // FingerList
-		this.tools = {}; // ToolList
-		this.pointables = {}; // PointableList
-		
-		for(index in handData.fingers){
-			if(handData.fingers[index].tool == false){
-				var newFinger = new Leap.Finger(handData.fingers[index],this);
+		if(handData instanceof Leap.Hand){
+			this.frame = handData.frame; // Frame
+			this.id = handData.id; // Int32
+			
+			this.fingers = {}; // FingerList
+			this.tools = {}; // ToolList
+			this.pointables = {}; // PointableList
+			
+			for(index in handData.fingers){
+				var newFinger = new Leap.Finger(handData.fingers[index]);
 				this.pointables[newFinger.id] = this.fingers[newFinger.id] = newFinger;
 			}
-			else{
-				var newTool = new Leap.Tool(handData.fingers[index],this);
+			
+			for(index in handData.tools){
+				var newTool = new Leap.Tool(handData.tools[index]);
 				this.pointables[newTool.id] = this.tools[newTool.id] = newTool;
 			}
+			
+			this.direction = (handData.direction==null)?null:new Leap.Vector(handData.direction); // Vector
+			this.palmNormal = (handData.palmNormal==null)?null:new Leap.Vector(handData.palmNormal); // Vector
+			this.palmPosition = (handData.palmPosition==null)?null:new Leap.Vector(handData.palmPosition); // Vector
+			this.palmVelocity = (handData.palmVelocity==null)?null:new Leap.Vector(handData.palmVelocity); // Vector
+			this.sphereCenter = (handData.sphereCenter==null)?null:new Leap.Vector(handData.sphereCenter); // Vector
+			this.sphereRadius = handData.sphereRadius; // Float
 		}
-		
-		if(handData.palm != null){
-			this.direction = new Leap.Vector(handData.palm.direction); // Vector
-			this.palmNormal = new Leap.Vector(handData.palm.normal); // Vector
-			this.palmPosition = new Leap.Vector(handData.palm.position); // Vector
-			this.palmVelocity = new Leap.Vector(handData.palm.velocity); // Vector
-			if(handData.palm.ball != null){
-				this.sphereCenter = new Leap.Vector(handData.palm.ball.center); // Vector
-				this.sphereRadius = handData.palm.ball.radius; // Float
+		else{
+			this.frame = parentFrame; // Frame
+			this.id = handData.id; // Int32
+			
+			this.fingers = {}; // FingerList
+			this.tools = {}; // ToolList
+			this.pointables = {}; // PointableList
+			
+			for(index in handData.fingers){
+				if(handData.fingers[index].tool == false){
+					var newFinger = new Leap.Finger(handData.fingers[index],this);
+					this.pointables[newFinger.id] = this.fingers[newFinger.id] = newFinger;
+				}
+				else{
+					var newTool = new Leap.Tool(handData.fingers[index],this);
+					this.pointables[newTool.id] = this.tools[newTool.id] = newTool;
+				}
+			}
+			
+			if(handData.palm != null){
+				this.direction = new Leap.Vector(handData.palm.direction); // Vector
+				this.palmNormal = new Leap.Vector(handData.palm.normal); // Vector
+				this.palmPosition = new Leap.Vector(handData.palm.position); // Vector
+				this.palmVelocity = new Leap.Vector(handData.palm.velocity); // Vector
+				if(handData.palm.ball != null){
+					this.sphereCenter = new Leap.Vector(handData.palm.ball.center); // Vector
+					this.sphereRadius = handData.palm.ball.radius; // Float
+				}
 			}
 		}
 	},
 
 	Finger : function(fingerData, parentHand){
-	
-		Leap.Pointable(this,fingerData,parentHand);
+
+		Leap.Pointable(fingerData,parentHand,this);
 		
 		this.isFinger = true; // Bool
 		this.isTool = false; // Bool
@@ -130,24 +177,40 @@ var Leap = {
 
 	Tool : function(toolData, parentHand){
 		
-		Leap.Pointable(this,toolData,parentHand);
+		Leap.Pointable(toolData,parentHand,this);
 		
 		this.isFinger = false; // Bool
 		this.isTool = true; // Bool
 	},
 
-	Pointable : function(obj, pointableData, parentHand){
+	Pointable : function(pointableData, parentHand, obj){
 		
-		obj.frame = parentHand.frame; // Frame
-		obj.hand = parentHand; // Hand
-		obj.id = pointableData.id; // Int32
+		if(obj==null) obj = this;
 		
-		obj.direction = new Leap.Vector(pointableData.tip.direction); // Vector direction
-		obj.tipPosition = new Leap.Vector(pointableData.tip.position); // Vector
-		obj.tipVelocity = new Leap.Vector(pointableData.tip.velocity); // Vector
-		
-		obj.length = pointableData.length; // Float
-		obj.width = pointableData.width; // Float
+		if(pointableData instanceof Leap.Finger || pointableData instanceof Leap.Tool){
+			obj.frame = pointableData.hand.frame; // Frame
+			obj.hand = pointableData.hand; // Hand
+			obj.id = pointableData.id; // Int32
+			
+			obj.direction = new Leap.Vector(pointableData.direction); // Vector direction
+			obj.tipPosition = new Leap.Vector(pointableData.tipPosition); // Vector
+			obj.tipVelocity = new Leap.Vector(pointableData.tipVelocity); // Vector
+			
+			obj.length = pointableData.length; // Float
+			obj.width = pointableData.width; // Float
+		}
+		else{
+			obj.frame = parentHand.frame; // Frame
+			obj.hand = parentHand; // Hand
+			obj.id = pointableData.id; // Int32
+			
+			obj.direction = new Leap.Vector(pointableData.tip.direction); // Vector direction
+			obj.tipPosition = new Leap.Vector(pointableData.tip.position); // Vector
+			obj.tipVelocity = new Leap.Vector(pointableData.tip.velocity); // Vector
+			
+			obj.length = pointableData.length; // Float
+			obj.width = pointableData.width; // Float
+		}
 	},
 
 	Vector : function(data){
