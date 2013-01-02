@@ -1,0 +1,194 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+	<body>
+		<script src="Leap.js"></script>
+		<script src="testdata.js"></script>
+		
+		<b>LeapJS Replay Demo:</b><br/>
+		<canvas id="canvas1" width="300" height="300" style="border-right: 4px solid blue"></canvas>
+		<canvas id="canvas2" width="400" height="300" style="border-top: 4px solid blue"></canvas><br/>
+		<form>
+			<input type="button" onclick="pause = true;" value="Pause" />
+			<input type="button" onclick="if(pause){pause = false; socketMessage();}" value="Play" />
+		</form>
+		<div id="output"></div>
+		
+		<script type="text/javascript">
+			
+			// Store context for canvas elements
+			var context1 = document.getElementById("canvas1").getContext('2d');
+			var context2 = document.getElementById("canvas2").getContext('2d');
+			
+			// Create a listener that will print frame data when a new frame arrives
+			myListener = new Leap.Listener();
+			myListener.onFrame = function(controller){
+				fade();
+				var o = '';
+				var frame = controller.frame();
+				o += 'id: ' + frame.id + '<br/>';
+				o += 'timestamp: ' + frame.timestamp + ' ' + realTime(frame.timestamp) + '<br/>';
+				for(id in frame.hands){
+					var hand = frame.hands[id];
+					drawHand(hand);
+					for(hid in hand.fingers){
+						var finger = hand.fingers[hid];
+						drawFinger(finger);
+					}
+					for(tid in hand.tools){
+						var tool = hand.tools[tid];
+						drawTool(tool);
+					}
+				}
+				document.getElementById("output").innerHTML = o;
+			}
+			
+			// Create a controller to connect to the Leap Motion
+			myController = new Leap.Controller("ws://localhost:6437/");
+			
+			// Add the listener to the controller
+			myController.addListener(myListener);
+			
+			// Extract timestamps from test data for live simulation
+			stamps = [];
+			for(i=0; i<test.length; i++){
+				stamps[i] = JSON.parse(test[i].data).timestamp;
+			}
+			
+			var pause = false; // Set render loop to play
+			
+			// Simulate live message interval with timestamps
+			var i = 0;
+			var socketMessage = function(){
+				if(pause) return;
+				var start = new Date().getTime();
+				myController.onmessage(test[i]);
+				i++;
+				var delay = 2*Math.round(stamps[i]-stamps[i-1])/1000 - (new Date().getTime() - start);
+				if(i<test.length) setTimeout(socketMessage, delay>=0?delay:0);
+				else{i=0; setTimeout(socketMessage, 20); }
+			}
+			socketMessage(); // Start render loop
+			
+			function pad(val, min){
+				while(val.toString().length<min) val = '0'+val;
+				return val;
+			}
+			
+			function realTime(timestamp){
+				var ms = timestamp/1000;
+				var s = ms/1000;
+				var m = s/60;
+				var h = m/60;
+				return '(' + pad(Math.floor(h)%60,2) + ':' + pad(Math.floor(m)%60,2) + ':' + pad(Math.floor(s)%60,2) + ':' + pad(Math.floor(ms)%1000,3) + ')';
+			}
+			
+			function drawFinger(finger){
+				var radius = finger.width/2;
+				var x = 300-(finger.tipPosition.z + 50);
+				var y = 300-(finger.tipPosition.y);
+				context1.beginPath()
+				context1.moveTo(x, y);
+				context1.lineTo(x-finger.direction.z*20, y-finger.direction.y*20);
+				context1.strokeStyle = 'red';
+				context1.stroke();
+				context1.beginPath();
+				context1.arc(x, y, radius, 0, 2 * Math.PI, false);
+				context1.fillStyle = 'rgba(255,255,255,.3)';
+				context1.fill();
+				context1.lineWidth = 1;
+				context1.strokeStyle = 'black';
+				context1.stroke();
+				
+				
+				radius = finger.width/2;
+				x = finger.tipPosition.x + 200;
+				y = finger.tipPosition.z + 50;
+				context2.beginPath();
+				context2.moveTo(x, y);
+				context2.lineTo(x+finger.direction.x*20, y+finger.direction.z*20);
+				context2.strokeStyle = 'red';
+				context2.stroke();
+				context2.beginPath();
+				context2.arc(x, y, radius, 0, 2 * Math.PI, false);
+				context2.fillStyle = 'rgba(255,255,255,.3)';
+				context2.fill();
+				context2.lineWidth = 1;
+				context2.strokeStyle = 'black';
+				context2.stroke();
+			}
+			
+			function drawTool(tool){
+				var x = 300-(tool.tipPosition.z + 50);
+				var y = 300-(tool.tipPosition.y);
+				
+				context1.beginPath();
+				context1.lineWidth = 1;
+				context1.moveTo(x, y);
+				context1.lineTo(x-tool.direction.z*20, y-tool.direction.y*20);
+				context1.strokeStyle = 'red';
+				context1.stroke();
+				
+				context1.beginPath();
+				context1.moveTo(x, y);
+				context1.lineTo(x+tool.direction.z*tool.length, y+tool.direction.y*tool.length);
+				context1.lineWidth = tool.width
+				context1.strokeStyle = 'black';
+				context1.stroke();
+				
+				
+				radius = 5;
+				x = tool.tipPosition.x + 200;
+				y = tool.tipPosition.z + 50;
+				
+				context2.beginPath();
+				context2.moveTo(x, y);
+				context2.lineTo(x+tool.direction.x*20, y+tool.direction.z*20);
+				context2.strokeStyle = 'red';
+				context2.lineWidth = 1;
+				context2.stroke();
+				
+				context2.beginPath();
+				context2.lineWidth = tool.width;
+				context2.moveTo(x, y);
+				context2.lineTo(x-tool.direction.x*tool.length, y-tool.direction.z*tool.length);
+				context2.strokeStyle = 'black';
+				context2.stroke();
+			}
+			
+			function drawHand(hand){
+			
+				if(hand.sphereRadius != null && Object.keys(hand.fingers).length>0){
+					var radius = hand.sphereRadius;
+					var x = 300-(hand.sphereCenter.z + 50);
+					var y = 300-(hand.sphereCenter.y);
+					context1.beginPath();
+					context1.arc(x, y, radius, 0, 2 * Math.PI, false);
+					context1.fillStyle = 'rgba(255,255,255,.3)';
+					context1.fill();
+					context1.lineWidth = 1;
+					context1.strokeStyle = 'black';
+					context1.stroke();
+					
+					
+					radius = hand.sphereRadius;
+					x = hand.sphereCenter.x + 200;
+					y = hand.sphereCenter.z + 50;
+					context2.beginPath();
+					context2.arc(x, y, radius, 0, 2 * Math.PI, false);
+					context2.fillStyle = 'rgba(255,255,255,.3)';
+					context2.fill();
+					context2.lineWidth = 1;
+					context2.strokeStyle = 'black';
+					context2.stroke();
+				}
+			}
+			
+			function fade(){
+				context1.fillStyle = 'rgba(255,255,255,.3)';
+				context1.fillRect(0,0,400,300);
+				context2.fillStyle = 'rgba(255,255,255,.3)';
+				context2.fillRect(0,0,400,300);
+			}
+		</script>
+	</body>
+</html>
