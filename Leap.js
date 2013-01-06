@@ -107,9 +107,6 @@ var Leap = {
 
 	Hand : function(handData, parentFrame){
 		
-		this.frame = (parentFrame==null)?handData.frame:parentFrame; // Frame
-		this.id = handData.id; // Int32
-		
 		this.fingers = new Leap.FingerList(); // FingerList
 		this.tools = new Leap.ToolList(); // ToolList
 		this.pointables = new Leap.PointableList(); // PointableList
@@ -119,6 +116,9 @@ var Leap = {
 		this.pointableTable = {};
 		
 		if(handData instanceof Leap.Hand){
+			
+			this.frame = handData.frame; // Frame
+			this.id = handData.id; // Int32
 			
 			for(f = 0; f < handData.fingers.length; f++){
 				var finger = new Leap.Finger(handData.fingers[f],this);
@@ -133,8 +133,18 @@ var Leap = {
 				this.pointables.push(tool);
 				this.tools.push(tool);
 			}
+			
+			this.direction = (handData.direction==null)?null:new Leap.Vector(handData.direction); // Vector
+			this.palmNormal = (handData.palmNormal==null)?null:new Leap.Vector(handData.palmNormal); // Vector
+			this.palmPosition = (handData.palmPosition==null)?null:new Leap.Vector(handData.palmPosition); // Vector
+			this.palmVelocity = (handData.palmVelocity==null)?null:new Leap.Vector(handData.palmVelocity); // Vector
+			this.sphereCenter = (handData.sphereCenter==null)?null:new Leap.Vector(handData.sphereCenter); // Vector
+			this.sphereRadius = handData.sphereRadius; // Float
 		}
-		else{
+		else if(handData != null){
+			
+			this.frame = parentFrame; // Frame
+			this.id = handData.id; // Int32
 			
 			for(id = 0; id < handData.fingers.length; id++){
 				if(handData.fingers[id].tool == false){
@@ -150,17 +160,7 @@ var Leap = {
 					this.tools.push(tool);
 				}
 			}
-		}
-		
-		if(handData instanceof Leap.Hand){
-			this.direction = (handData.direction==null)?null:new Leap.Vector(handData.direction); // Vector
-			this.palmNormal = (handData.palmNormal==null)?null:new Leap.Vector(handData.palmNormal); // Vector
-			this.palmPosition = (handData.palmPosition==null)?null:new Leap.Vector(handData.palmPosition); // Vector
-			this.palmVelocity = (handData.palmVelocity==null)?null:new Leap.Vector(handData.palmVelocity); // Vector
-			this.sphereCenter = (handData.sphereCenter==null)?null:new Leap.Vector(handData.sphereCenter); // Vector
-			this.sphereRadius = handData.sphereRadius; // Float
-		}
-		else{
+			
 			if(handData.palm != null){
 				this.direction = new Leap.Vector(handData.palm.direction); // Vector
 				this.palmNormal = new Leap.Vector(handData.palm.normal); // Vector
@@ -171,6 +171,17 @@ var Leap = {
 					this.sphereRadius = handData.palm.ball.radius; // Float
 				}
 			}
+		}
+		else{
+		
+			this.frame = null; // Frame
+			this.id = null; // Int32
+			this.direction = new Leap.Vector(); // Vector
+			this.palmNormal = new Leap.Vector(); // Vector
+			this.palmPosition = new Leap.Vector(); // Vector
+			this.palmVelocity = new Leap.Vector(); // Vector
+			this.sphereCenter = new Leap.Vector(); // Vector
+			this.sphereRadius = null; // Float
 		}
 	},
 	
@@ -259,10 +270,15 @@ var Leap = {
 			this.y = data.y;
 			this.z = data.z;
 		}
-		else{
+		else if(data != null){
 			this.x = (typeof(data[0]) == "number")?data[0]:0; // Float
 			this.y = (typeof(data[1]) == "number")?data[1]:0; // Float
 			this.z = (typeof(data[2]) == "number")?data[2]:0; // Float
+		}
+		else{
+			this.x = 0;
+			this.y = 0;
+			this.z = 0;
 		}
 	},
 	

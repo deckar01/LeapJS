@@ -33,8 +33,8 @@ LeapJS is a Javascript library that provides the functionality and object struct
   * _Pointable_ **pointable**( _string_ **id** )
   * _Tool_ **tool**( _string_ **id** )
 * **Hand**
+  * **Hand**()
   * **Hand**( _Hand_ **other** )
-  * **Hand**( _Object_ **handData**, _Frame_ **parentFrame** )
   * _Frame_ **frame**
   * _string_ **id**
   * _FingerList_ **fingers**
