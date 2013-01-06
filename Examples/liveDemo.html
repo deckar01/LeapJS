@@ -23,21 +23,21 @@
 				var frame = controller.frame();
 				o += 'id: ' + frame.id + '<br/>';
 				o += 'timestamp: ' + frame.timestamp + ' ' + realTime(frame.timestamp) + '<br/>';
-				for(id in frame.hands){
+				for(id = 0; id < frame.hands.count(); id++){
 					var hand = frame.hands[id];
 					drawHand(hand);
-					for(hid in hand.fingers){
+					for(hid = 0; hid < hand.fingers.count(); hid++){
 						var finger = hand.fingers[hid];
 						drawFinger(finger);
 					}
-					for(tid in hand.tools){
+					for(tid = 0; tid < hand.tools.count(); tid++){
 						var tool = hand.tools[tid];
 						drawTool(tool);
 					}
 				}
 				document.getElementById("output").innerHTML = o;
 			}
-			myListener.onDisconnect - function(controller){
+			myListener.onDisconnect = function(controller){
 				document.getElementById("output").innerHTML = 'Device disconnected.';
 			}
 			

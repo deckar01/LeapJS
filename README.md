@@ -22,10 +22,10 @@ LeapJS is a Javascript library that provides the functionality and object struct
   * **Frame**( _Object_ **frameData** )
   * _string_ **id**
   * _string_ **timestamp**
-  * _Finger{}_ **fingers**
-  * _Tool{}_ **tools**
-  * _Pointable{}_ **pointables**
-  * _Hand{}_ **hands**
+  * _FingerList_ **fingers**
+  * _ToolList_ **tools**
+  * _PointableList_ **pointables**
+  * _HandList_ **hands**
   * _string_ **tostring**()
   * _Bool_ **isValid**
   * _Finger_ **finger**( _string_ **id** )
@@ -37,9 +37,9 @@ LeapJS is a Javascript library that provides the functionality and object struct
   * **Hand**( _Object_ **handData**, _Frame_ **parentFrame** )
   * _Frame_ **frame**
   * _string_ **id**
-  * _Finger{}_ **fingers**
-  * _Tool{}_ **tools**
-  * _Pointable{}_ **pointables**
+  * _FingerList_ **fingers**
+  * _ToolList_ **tools**
+  * _PointableList_ **pointables**
   * _Vector_ **direction**
   * _Vector_ **palmNormal**
   * _Vector_ **palmPosition**
@@ -52,14 +52,27 @@ LeapJS is a Javascript library that provides the functionality and object struct
   * _Pointable_ **pointable**( _string_ **id** )
   * _Tool_ **tool**( _string_ **id** )
 * **Finger** : _Pointable_
-  * **Finger**( _Finger_ **other** )
-  * **Finger**( _Object_ **fingerData**, _Hand_ **parentHand** )
+  * **Finger**()
+  * **Finger**( _Pointable_ **other** )
+* **FingerList**
+  * **FingerList**()
+  * **FingerList**( _FingerList_ **other** )
+  * _Finger_ **operator[]**
+  * _void_ **append**( _FingerList_ **other** )
+  * _int_ **count**()
+  * _Bool_ **empty**()
 * **Tool** : _Pointable_
-  * **Tool**( _Tool_ **other** )
-  * **Tool**( _Object_ **toolData**, _Hand_ **parentHand** )
+  * **Tool**()
+  * **Tool**( _Pointable_ **other** )
+* **ToolList**
+  * **ToolList**()
+  * **ToolList**( _ToolList_ **other** )
+  * _Finger_ **operator[]**
+  * _void_ **append**( _ToolList_ **other** )
+  * _int_ **count**()
 * **Pointable**
-  * **Pointable**( _Pointable_ **other** )
-  * **Pointable**( _Object_ **pointableData**, _Hand_ **parentHand**, _Object_ **obj** )  
+  * **Pointable**()
+  * **Pointable**( _Pointable_ **other** ) 
   * _Frame_ **frame**
   * _Hand_ **hand**
   * _string_ **id**
@@ -72,6 +85,14 @@ LeapJS is a Javascript library that provides the functionality and object struct
   * _Bool_ **isTool**
   * _Bool_ **isValid**
   * _string_ **tostring**()
+* **PointableList**
+  * **PointableList**()
+  * **PointableList**( _PointableList_ **other** )
+  * _Finger_ **operator[]**
+  * _void_ **append**( _PointableList_ **other** )
+  * _void_ **append**( _FingerList_ **other** )
+  * _void_ **append**( _ToolList_ **other** )
+  * _int_ **count**()
 * **Vector**
   * **Vector**()
   * **Vector**( _Vector_ **other** )
