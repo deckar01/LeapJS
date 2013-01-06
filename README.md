@@ -49,6 +49,13 @@ LeapJS is a Javascript library that provides the functionality and object struct
   * _Finger_ **finger**( _string_ **id** )
   * _Pointable_ **pointable**( _string_ **id** )
   * _Tool_ **tool**( _string_ **id** )
+* **HandList**
+  * **HandList**()
+  * **HandList**( _HandList_ **other** )
+  * _Hand_ **operator[]**
+  * _void_ **append**( _HandList_ **other** )
+  * _int_ **count**()
+  * _Bool_ **empty**()
 * **Finger** : _Pointable_
   * **Finger**()
   * **Finger**( _Pointable_ **other** )
@@ -65,7 +72,7 @@ LeapJS is a Javascript library that provides the functionality and object struct
 * **ToolList**
   * **ToolList**()
   * **ToolList**( _ToolList_ **other** )
-  * _Finger_ **operator[]**
+  * _Tool_ **operator[]**
   * _void_ **append**( _ToolList_ **other** )
   * _int_ **count**()
 * **Pointable**
@@ -86,7 +93,7 @@ LeapJS is a Javascript library that provides the functionality and object struct
 * **PointableList**
   * **PointableList**()
   * **PointableList**( _PointableList_ **other** )
-  * _Finger_ **operator[]**
+  * _Pointable_ **operator[]**
   * _void_ **append**( _PointableList_ **other** )
   * _void_ **append**( _FingerList_ **other** )
   * _void_ **append**( _ToolList_ **other** )
