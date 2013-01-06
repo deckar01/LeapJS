@@ -18,8 +18,6 @@ LeapJS is a Javascript library that provides the functionality and object struct
   * _void_ **onFrame**( _Controller_ **controller** )
   * _void_ **onInit**( _Controller_ **controller** )
 * **Frame**
-  * **Frame**( _Frame_ **other** )
-  * **Frame**( _Object_ **frameData** )
   * _string_ **id**
   * _string_ **timestamp**
   * _FingerList_ **fingers**
