@@ -10,6 +10,8 @@ LeapJS is a Javascript library that provides the functionality and object struct
   * _Frame_ **frame**( _Int_ **index** )
   * _void_ **addListener**( _Listener_ **listener** )
   * _void_ **removeListener**( _Listener_ **listener** )
+  * _void_ **startEmptyFrames**()
+  * _void_ **stopEmptyFrames**()
 * **Listener**
   * **Listener**()
   * _void_ **onConnect**( _Controller_ **controller** )
