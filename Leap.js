@@ -20,6 +20,8 @@ var Leap = {
 		
 		this.onmessage = function(event){
 			
+			this.lastStamp = new Date().getTime(); // Used for empty frame simulation
+			
 			var eventData = JSON.parse(event.data);
 			var newFrame = new Leap.Frame(eventData);
 			this.frames.push(newFrame);
@@ -56,6 +58,11 @@ var Leap = {
 				this.onclose(event);
 			};
 		}
+		
+		// Used for empty frame simulation
+		this.interval = null;
+		this.lastStamp = 0;
+		this.startEmptyFrames();
 	},
 	
 	Listener : function(){
@@ -69,38 +76,54 @@ var Leap = {
 	},
 
 	Frame : function(frameData){
-		
-		this.id = frameData.id; // Int32
-		this.timestamp = frameData.timestamp; // Int64
-		
-		this.fingers = new Leap.FingerList(); // FingerList
-		this.tools = new Leap.ToolList(); // ToolList
-		this.pointables = new Leap.PointableList(); // PointableList
-		this.hands = new Leap.HandList(); // HandList
-		
-		this.fingerTable = {};
-		this.toolTable = {};
-		this.pointableTable = {};
-		this.handTable = {};
-		
-		for(index in frameData.hands){
-		
-			var newHand = new Leap.Hand(frameData.hands[index],this)
-			this.handTable[newHand.id] = newHand;
-			this.hands.push(newHand);
+	
+		if(frameData == null){
+			this.id = null; // Int32
+			this.timestamp = null; // Int64
 			
-			if(newHand.fingers != null)
-			for(f = 0; f < newHand.fingers.length; f++){
-				this.pointableTable[newHand.fingers[f].id] = this.fingerTable[newHand.fingers[f].id] = newHand.fingers[f];
-				this.pointables.push(newHand.fingers[f]);
-				this.fingers.push(newHand.fingers[f]);
-			}
+			this.fingers = new Leap.FingerList(); // FingerList
+			this.tools = new Leap.ToolList(); // ToolList
+			this.pointables = new Leap.PointableList(); // PointableList
+			this.hands = new Leap.HandList(); // HandList
 			
-			if(newHand.tools != null)
-			for(t = 0; t < newHand.tools.length; t++){
-				this.pointableTable[newHand.tools[t].id] = this.toolTable[newHand.tools[t].id] = newHand.tools[t];
-				this.pointables.push(newHand.tools[t]);
-				this.tools.push(newHand.tools[t]);
+			this.fingerTable = {};
+			this.toolTable = {};
+			this.pointableTable = {};
+			this.handTable = {};
+		}
+		else{
+			this.id = frameData.id; // Int32
+			this.timestamp = frameData.timestamp; // Int64
+			
+			this.fingers = new Leap.FingerList(); // FingerList
+			this.tools = new Leap.ToolList(); // ToolList
+			this.pointables = new Leap.PointableList(); // PointableList
+			this.hands = new Leap.HandList(); // HandList
+			
+			this.fingerTable = {};
+			this.toolTable = {};
+			this.pointableTable = {};
+			this.handTable = {};
+			
+			for(index in frameData.hands){
+			
+				var newHand = new Leap.Hand(frameData.hands[index],this)
+				this.handTable[newHand.id] = newHand;
+				this.hands.push(newHand);
+				
+				if(newHand.fingers != null)
+				for(f = 0; f < newHand.fingers.length; f++){
+					this.pointableTable[newHand.fingers[f].id] = this.fingerTable[newHand.fingers[f].id] = newHand.fingers[f];
+					this.pointables.push(newHand.fingers[f]);
+					this.fingers.push(newHand.fingers[f]);
+				}
+				
+				if(newHand.tools != null)
+				for(t = 0; t < newHand.tools.length; t++){
+					this.pointableTable[newHand.tools[t].id] = this.toolTable[newHand.tools[t].id] = newHand.tools[t];
+					this.pointables.push(newHand.tools[t]);
+					this.tools.push(newHand.tools[t]);
+				}
 			}
 		}
 	},
@@ -256,6 +279,17 @@ var Leap = {
 			obj.length = null; // Float
 			obj.width = null; // Float
 		}
+		
+		obj.isValid = true; // Bool
+	
+		obj.toString = function(){
+			var val = "{id:"+this.id+",direction:"+this.direction.toString()+",";
+			val += "tipPosition:"+this.tipPosition.toString()+",";
+			val += "tipVelocity:"+this.tipVelocity.toString()+",";
+			val += "length:"+this.length+",";
+			val += "width:"+this.width+"}";
+			return val;
+		}
 	},
 	
 	PointableList : function(other){
@@ -327,14 +361,34 @@ Leap.Controller.prototype = {
 		listener.onExit(this);
 		this.listeners[listener.id].onExit(this);
 		delete this.listeners[listener.id];
-	}
+	},
+	
+	// Used for empty frame simulation
+	
+	simulateEmptyFrame : function(controller){
+		var time = new Date().getTime();
+		if(time > controller.lastStamp+30){
+			var newFrame = new Leap.Frame();
+			controller.frames.push(newFrame);
+			for(index in controller.listeners)
+				controller.listeners[index].onFrame(controller);
+			controller.lastFrame = time;
+		}
+	},
+	
+	startEmptyFrames : function(){
+		var controller = this;
+		this.interval = setInterval(function(){controller.simulateEmptyFrame(controller);}, 30);
+	},
+	
+	stopEmptyFrames : function(){ clearInterval(this.interval); }
 }
 
 Leap.Frame.prototype = {
 	
 	toString : function(){
 		var val = "{timestamp:"+this.timestamp+",id:"+this.id+",hands:[";
-		for(index in this.hands) val += this.hands[index].toString();
+		for(var i=0; i < this.hands.length; i++) val += this.hands[i].toString();
 		val += "]}";
 		return val;
 	},
@@ -368,9 +422,9 @@ Leap.Hand.prototype = {
 		var val = "{id:"+this.id+",sphereCenter:"+(this.sphereCenter==null?"null":this.sphereCenter)+",";
 		val += "sphereRadius:"+(this.sphereRadius==null?"null":this.sphereRadius)+",";
 		val += "normal:"+(this.normal==undefined?"null":this.normal.toString())+",fingers:[";
-		for(index in this.fingers) val += this.fingers[index].toString();
+		for(var i=0; i < this.fingers.length; i++) val += this.fingers[i].toString();
 		val += "],tools:[";
-		for(index in this.tools) val += this.tools[index].toString();
+		for(var i=0; i < this.tools.length; i++) val += this.tools[i].toString();
 		val += "],palmNormal:"+(this.palmNormal==undefined?"null":this.palmNormal.toString())+",";
 		val += "palmPosition:"+(this.palmPosition==undefined?"null":this.palmPosition.toString())+",";
 		val += "palmVelocity:"+(this.palmVelocity==undefined?"null":this.palmVelocity.toString())+"}";
@@ -427,20 +481,6 @@ Leap.ToolList.prototype.count = function(){
 Leap.ToolList.prototype.empty = function(){
 	return this.length>0;
 };
-
-Leap.Pointable.prototype = {
-	
-	isValid : true, // Bool
-	
-	toString : function(){
-		var val = "{id:"+this.id+",direction:"+this.direction.toString()+",";
-		val += "tipPosition:"+this.tipPosition.toString()+",";
-		val += "tipVelocity:"+this.tipVelocity.toString()+",";
-		val += "length:"+this.length+",";
-		val += "width:"+this.width+"}";
-		return val;
-	}
-}
 
 Leap.PointableList.prototype = new Array;
 Leap.PointableList.prototype.append = function(other){

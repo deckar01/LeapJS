@@ -9,8 +9,8 @@
 		<canvas id="canvas1" width="300" height="300" style="border-right: 4px solid blue"></canvas>
 		<canvas id="canvas2" width="400" height="300" style="border-top: 4px solid blue"></canvas><br/>
 		<form>
-			<input type="button" onclick="pause = true;" value="Pause" />
-			<input type="button" onclick="if(pause){pause = false; socketMessage();}" value="Play" />
+			<input type="button" onclick="pause = true; myController.stopEmptyFrames();" value="Pause" />
+			<input type="button" onclick="if(pause){pause = false; socketMessage(); myController.startEmptyFrames();}" value="Play" />
 		</form>
 		<div id="output"></div>
 		
