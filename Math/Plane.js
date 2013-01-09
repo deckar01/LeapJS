@@ -43,5 +43,7 @@ Plane.prototype.lineIntersect = function(linePosition, lineDirection){
 	var y = linePosition.y + lineDirection.y*t;
 	var z = linePosition.z + lineDirection.z*t;
 	
-	return new Leap.Vector([x, y, z]);
+	var distance = t*lineDirection.magnitude();
+	
+	return {position: new Leap.Vector([x, y, z]), distance: distance};
 }
