@@ -1,3 +1,5 @@
+![LeapJS](http://deckar01.github.com/images/LeapJS.png)
+
 LeapJS
 ======
 
