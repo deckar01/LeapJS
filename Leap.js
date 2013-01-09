@@ -279,17 +279,6 @@ var Leap = {
 			obj.length = null; // Float
 			obj.width = null; // Float
 		}
-		
-		obj.isValid = true; // Bool
-	
-		obj.toString = function(){
-			var val = "{id:"+this.id+",direction:"+this.direction.toString()+",";
-			val += "tipPosition:"+this.tipPosition.toString()+",";
-			val += "tipVelocity:"+this.tipVelocity.toString()+",";
-			val += "length:"+this.length+",";
-			val += "width:"+this.width+"}";
-			return val;
-		}
 	},
 	
 	PointableList : function(other){
@@ -460,6 +449,20 @@ Leap.HandList.prototype.empty = function(){
 	return this.length>0;
 };
 
+Leap.Finger.prototype = {
+
+	isValid : true, // Bool
+	
+	toString : function(){
+		var val = "{id:"+this.id+",direction:"+this.direction.toString()+",";
+		val += "tipPosition:"+this.tipPosition.toString()+",";
+		val += "tipVelocity:"+this.tipVelocity.toString()+",";
+		val += "length:"+this.length+",";
+		val += "width:"+this.width+"}";
+		return val;
+	}
+}
+
 Leap.FingerList.prototype = new Array;
 Leap.FingerList.prototype.append = function(other){
 	for(i=0; i<other.length; i++) this.push(new Leap.Finger(other[i]));
@@ -470,6 +473,20 @@ Leap.FingerList.prototype.count = function(){
 Leap.FingerList.prototype.empty = function(){
 	return this.length>0;
 };
+
+Leap.Tool.prototype = {
+
+	isValid : true, // Bool
+	
+	toString : function(){
+		var val = "{id:"+this.id+",direction:"+this.direction.toString()+",";
+		val += "tipPosition:"+this.tipPosition.toString()+",";
+		val += "tipVelocity:"+this.tipVelocity.toString()+",";
+		val += "length:"+this.length+",";
+		val += "width:"+this.width+"}";
+		return val;
+	}
+}
 
 Leap.ToolList.prototype = new Array;
 Leap.ToolList.prototype.append = function(other){
