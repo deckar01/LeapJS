@@ -499,6 +499,20 @@ Leap.ToolList.prototype.empty = function(){
 	return this.length>0;
 };
 
+Leap.Pointable.prototype = {
+
+	isValid : true, // Bool
+	
+	toString : function(){
+		var val = "{id:"+this.id+",direction:"+this.direction.toString()+",";
+		val += "tipPosition:"+this.tipPosition.toString()+",";
+		val += "tipVelocity:"+this.tipVelocity.toString()+",";
+		val += "length:"+this.length+",";
+		val += "width:"+this.width+"}";
+		return val;
+	}
+}
+
 Leap.PointableList.prototype = new Array;
 Leap.PointableList.prototype.append = function(other){
 	for(i=0; i<other.length; i++) this.push(new Leap.Pointable(other[i]));
