@@ -20,8 +20,6 @@ var Leap = {
 		
 		this.onmessage = function(event){
 			
-			this.lastStamp = new Date().getTime(); // Used for empty frame simulation
-			
 			var eventData = JSON.parse(event.data);
 			var newFrame = new Leap.Frame(eventData);
 			this.frames.push(newFrame);
@@ -58,11 +56,6 @@ var Leap = {
 				this.onclose(event);
 			};
 		}
-		
-		// Used for empty frame simulation
-		this.interval = null;
-		this.lastStamp = 0;
-		this.startEmptyFrames();
 	},
 	
 	Listener : function(){
@@ -350,27 +343,7 @@ Leap.Controller.prototype = {
 		listener.onExit(this);
 		this.listeners[listener.id].onExit(this);
 		delete this.listeners[listener.id];
-	},
-	
-	// Used for empty frame simulation
-	
-	simulateEmptyFrame : function(controller){
-		var time = new Date().getTime();
-		if(time > controller.lastStamp+30){
-			var newFrame = new Leap.Frame();
-			controller.frames.push(newFrame);
-			for(index in controller.listeners)
-				controller.listeners[index].onFrame(controller);
-			controller.lastFrame = time;
-		}
-	},
-	
-	startEmptyFrames : function(){
-		var controller = this;
-		this.interval = setInterval(function(){controller.simulateEmptyFrame(controller);}, 30);
-	},
-	
-	stopEmptyFrames : function(){ clearInterval(this.interval); }
+	}
 }
 
 Leap.Frame.prototype = {
