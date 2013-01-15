@@ -1,4 +1,5 @@
 var Leap = { Version : "0.7.1" };
+
 Leap.Controller = function(connection){
 	
 	this._frames = [];
