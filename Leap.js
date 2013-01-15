@@ -73,6 +73,7 @@ Leap.Controller.prototype = {
 			this._listeners[index].onFrame(this);
 	}
 };
+
 Leap.Frame = function(frameData){
 
 	this._fingers = new Leap.FingerList();
@@ -217,6 +218,7 @@ Leap.Frame.prototype = {
 Leap.Frame.invalid = function(){
 	return new Leap.Frame();
 };
+
 Leap.Hand = function(handData, parentFrame){
 	
 	this._fingers = new Leap.FingerList();
@@ -365,6 +367,7 @@ Leap.Hand.prototype = {
 Leap.Hand.invalid = function(){
 	return new Leap.Hand();
 };
+
 Leap.HandList = function(){};
 
 Leap.HandList.prototype = new Array;
@@ -383,6 +386,7 @@ Leap.HandList.prototype.empty = function(){
 
 	return this.length > 0;
 };
+
 Leap.Listener = function(){
 	
 	this.onConnect = function(controller){};
@@ -391,6 +395,7 @@ Leap.Listener = function(){
 	this.onFrame = function(controller){};
 	this.onInit = function(controller){};
 };
+
 Leap.Matrix = function(data){
 	
 	if(data instanceof Leap.Matrix){
@@ -511,6 +516,7 @@ Leap.Matrix.prototype = {
 };
 
 Leap.Matrix.identity = function(){ return new Leap.Matrix(); };
+
 Leap.Pointable = function(pointableData, parentHand, obj){
 	
 	if(obj==null) obj = this;
@@ -624,6 +630,7 @@ Leap.Tool.prototype = Leap.Pointable.prototype;
 Leap.Tool.invalid = function(){
 	return new Leap.Tool();
 };
+
 Leap.PointableList = function(){};
 
 Leap.PointableList.prototype = new Array;
@@ -671,6 +678,7 @@ Leap.ToolList.prototype.count = function(){
 Leap.ToolList.prototype.empty = function(){
 	return this.length>0;
 };
+
 Leap.Vector = function(data){
 	
 	if(data instanceof Leap.Vector){
@@ -790,3 +798,4 @@ Leap.Vector.xAxis = function(){ return new Leap.Vector([1,0,0]); };
 Leap.Vector.yAxis = function(){ return new Leap.Vector([0,1,0]); };
 Leap.Vector.zAxis = function(){ return new Leap.Vector([0,0,1]); };
 Leap.Vector.zero = function(){ return new Leap.Vector([0,0,0]); };
+
