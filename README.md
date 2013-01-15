@@ -21,78 +21,78 @@ LeapJS is a Javascript library that provides the functionality and object struct
   * _void_ **onInit**( _Controller_ **controller** )
 * **Frame**
   * **Frame**()
-  * _string_ **id**
-  * _string_ **timestamp**
-  * _FingerList_ **fingers**
-  * _ToolList_ **tools**
-  * _PointableList_ **pointables**
-  * _HandList_ **hands**
-  * _string_ **tostring**()
-  * _Bool_ **isValid**
+  * _string_ **id**()
+  * _string_ **timestamp**()
+  * _FingerList_ **fingers**()
+  * _ToolList_ **tools**()
+  * _PointableList_ **pointables**()
+  * _HandList_ **hands**()
   * _Finger_ **finger**( _string_ **id** )
   * _Hand_ **hand**( _string_ **id** )
   * _Pointable_ **pointable**( _string_ **id** )
   * _Tool_ **tool**( _string_ **id** )
+  * _string_ **tostring**()
+  * _Bool_ **compare**( _Frame_ **other** )
+  * _Bool_ **isValid**()
+  * _static Frame_ **invalid**()
 * **Hand**
   * **Hand**()
-  * **Hand**( _Hand_ **other** )
-  * _Frame_ **frame**
-  * _string_ **id**
-  * _FingerList_ **fingers**
-  * _ToolList_ **tools**
-  * _PointableList_ **pointables**
-  * _Vector_ **direction**
-  * _Vector_ **palmNormal**
-  * _Vector_ **palmPosition**
-  * _Vector_ **palmVelocity**
-  * _Vector_ **sphereCenter**
-  * _float_ **sphereRadius**
-  * _string_ **tostring**()
-  * _Bool_ **isValid**
+  * _Frame_ **frame**()
+  * _string_ **id**()
+  * _FingerList_ **fingers**()
+  * _ToolList_ **tools**()
+  * _PointableList_ **pointables**()
+  * _Vector_ **direction**()
+  * _Vector_ **palmNormal**()
+  * _Vector_ **palmPosition**()
+  * _Vector_ **palmVelocity**()
+  * _Vector_ **sphereCenter**()
+  * _float_ **sphereRadius**()
   * _Finger_ **finger**( _string_ **id** )
   * _Pointable_ **pointable**( _string_ **id** )
   * _Tool_ **tool**( _string_ **id** )
+  * _string_ **tostring**()
+  * _Bool_ **isValid**()
+  * _static Hand_ **invalid**()
 * **HandList**
   * **HandList**()
-  * **HandList**( _HandList_ **other** )
   * _Hand_ **operator[]**
   * _void_ **append**( _HandList_ **other** )
   * _int_ **count**()
   * _Bool_ **empty**()
 * **Finger** : _Pointable_
   * **Finger**()
-  * **Finger**( _Pointable_ **other** )
+  * _static Finger_ **invalid**()
 * **FingerList**
   * **FingerList**()
-  * **FingerList**( _FingerList_ **other** )
   * _Finger_ **operator[]**
   * _void_ **append**( _FingerList_ **other** )
   * _int_ **count**()
   * _Bool_ **empty**()
 * **Tool** : _Pointable_
   * **Tool**()
-  * **Tool**( _Pointable_ **other** )
+  * _static Tool_ **invalid**()
 * **ToolList**
   * **ToolList**()
-  * **ToolList**( _ToolList_ **other** )
   * _Tool_ **operator[]**
   * _void_ **append**( _ToolList_ **other** )
   * _int_ **count**()
 * **Pointable**
   * **Pointable**()
-  * **Pointable**( _Pointable_ **other** ) 
-  * _Frame_ **frame**
-  * _Hand_ **hand**
-  * _string_ **id**
-  * _Vector_ **direction**
-  * _Vector_ **tipPosition**
-  * _Vector_ **tipVelocity**
-  * _float_ **length**
-  * _float_ **width**
-  * _Bool_ **isFinger**
-  * _Bool_ **isTool**
-  * _Bool_ **isValid**
+  * _Frame_ **frame**()
+  * _Hand_ **hand**()
+  * _string_ **id**()
+  * _Vector_ **direction**()
+  * _Vector_ **tipPosition**()
+  * _Vector_ **tipVelocity**()
+  * _float_ **length**()
+  * _float_ **width**()
+  * _Bool_ **isFinger**()
+  * _Bool_ **isTool**()
   * _string_ **tostring**()
+  * _Bool_ **compare**( _Pointable_ **other** )
+  * _Bool_ **isValid**()
+  * _static Pointable_ **invalid**()
 * **PointableList**
   * **PointableList**()
   * **PointableList**( _PointableList_ **other** )
@@ -123,6 +123,8 @@ LeapJS is a Javascript library that provides the functionality and object struct
   * _float_ **roll**()
   * _float_ **yaw**()
   * _string_ **tostring**()
+  * _Bool_ **compare**( _Vector_ **other** )
+  * _Bool_ **isValid**()
   * _static Vector_ **backward**()
   * _static Vector_ **down**()
   * _static Vector_ **forward**()
@@ -142,6 +144,7 @@ LeapJS is a Javascript library that provides the functionality and object struct
   * _Vector_ **yBasis**
   * _Vector_ **zBasis**
   * _Vector_ **origin**
+  * _Matrix_ **rigidInverse**()
   * _void_ **setRotation**( _Vector_ **axis**, _float_ **angle** )
   * _void_ **transformPoint**( _Vector_ **data** )
   * _void_ **transformDirection**( _Vector_ **data** )

@@ -1,581 +1,423 @@
-/******************************************************************************\
-* Copyright (C) 2012 Leap Motion, Inc. All rights reserved.                    *
-* NOTICE: This developer release of Leap Motion, Inc. software is confidential *
-* and intended for very limited distribution. Parties using this software must *
-* accept the SDK Agreement prior to obtaining this software and related tools. *
-* This software is subject to copyright.                                       *
-\******************************************************************************/
-
-var Leap = {
-
-	Version : "0.7.0",
+var Leap = { Version : "0.7.1" };
+Leap.Controller = function(connection){
 	
-	Controller : function(connection){
+	this._frames = [];
+	this._listeners = {};
+	this._listenerId = 0;
 	
-		this.frames = [];
+	if ((typeof(WebSocket) == 'undefined') && (typeof(MozWebSocket) != 'undefined')) WebSocket = MozWebSocket;
+	
+	if (typeof(WebSocket) != 'undefined'){
 		
-		this.listenerId = 0;
+		this._socket = new WebSocket(connection);
+		this._socket._controller = this;
 		
-		this.listeners = {};
-		
-		this.onmessage = function(event){
-			
-			var eventData = JSON.parse(event.data);
-			var newFrame = new Leap.Frame(eventData);
-			this.frames.push(newFrame);
-			for(index in this.listeners)
-				this.listeners[index].onFrame(this);
+		this._socket._onmessage = function(event){
+			this._controller._onmessage(event);
 		};
 		
-		this.connected = false;
+		this._socket.onopen = function(event){
+			for(index in this._controller._listeners)
+				this._controller._listeners[index].onConnect(this._controller);
+		};
 		
-		if ((typeof(WebSocket) == 'undefined') && (typeof(MozWebSocket) != 'undefined')) WebSocket = MozWebSocket;
+		this._socket.onclose = function(event){
+			for(index in this._controller._listeners)
+				this._controller._listeners[index].onDisconnect(this._controller);
+		};
 		
-		if (typeof(WebSocket) != 'undefined'){
-			
-			this.Socket = new WebSocket(connection);
-			this.Socket.controller = this;
-			
-			this.Socket.onmessage = function(event){
-				this.controller.onmessage(event);
-			};
-			
-			this.Socket.onopen = function(event){
-				this.connected = true;
-				for(index in this.controller.listeners)
-					this.controller.listeners[index].onConnect(this.controller);
-			};
-			
-			this.Socket.onclose = function(event){
-				this.connected = false;
-				for(index in this.controller.listeners)
-					this.controller.listeners[index].onDisconnect(this.controller);
-			};
-			
-			this.Socket.onerror = function(event){ 
-				this.onclose(event);
-			};
-		}
-	},
-	
-	Listener : function(){
-	
-		this.onConnect = function(controller){};
-		this.onDisconnect = function(controller){};
-		this.onExit = function(controller){};
-		this.onFrame = function(controller){};
-		this.onInit = function(controller){};
-		
-	},
-
-	Frame : function(frameData){
-	
-		if(frameData == null){
-			this.id = null; // Int32
-			this.timestamp = null; // Int64
-			
-			this.fingers = new Leap.FingerList(); // FingerList
-			this.tools = new Leap.ToolList(); // ToolList
-			this.pointables = new Leap.PointableList(); // PointableList
-			this.hands = new Leap.HandList(); // HandList
-			
-			this.fingerTable = {};
-			this.toolTable = {};
-			this.pointableTable = {};
-			this.handTable = {};
-		}
-		else{
-			this.id = frameData.id; // Int32
-			this.timestamp = frameData.timestamp; // Int64
-			
-			this.fingers = new Leap.FingerList(); // FingerList
-			this.tools = new Leap.ToolList(); // ToolList
-			this.pointables = new Leap.PointableList(); // PointableList
-			this.hands = new Leap.HandList(); // HandList
-			
-			this.fingerTable = {};
-			this.toolTable = {};
-			this.pointableTable = {};
-			this.handTable = {};
-			
-			for(index in frameData.hands){
-			
-				var newHand = new Leap.Hand(frameData.hands[index],this)
-				this.handTable[newHand.id] = newHand;
-				this.hands.push(newHand);
-				
-				if(newHand.fingers != null)
-				for(f = 0; f < newHand.fingers.length; f++){
-					this.pointableTable[newHand.fingers[f].id] = this.fingerTable[newHand.fingers[f].id] = newHand.fingers[f];
-					this.pointables.push(newHand.fingers[f]);
-					this.fingers.push(newHand.fingers[f]);
-				}
-				
-				if(newHand.tools != null)
-				for(t = 0; t < newHand.tools.length; t++){
-					this.pointableTable[newHand.tools[t].id] = this.toolTable[newHand.tools[t].id] = newHand.tools[t];
-					this.pointables.push(newHand.tools[t]);
-					this.tools.push(newHand.tools[t]);
-				}
-			}
-		}
-	},
-
-	Hand : function(handData, parentFrame){
-		
-		this.fingers = new Leap.FingerList(); // FingerList
-		this.tools = new Leap.ToolList(); // ToolList
-		this.pointables = new Leap.PointableList(); // PointableList
-		
-		this.fingerTable = {};
-		this.toolTable = {};
-		this.pointableTable = {};
-		
-		if(handData instanceof Leap.Hand){
-			
-			this.frame = handData.frame; // Frame
-			this.id = handData.id; // Int32
-			
-			for(f = 0; f < handData.fingers.length; f++){
-				var finger = new Leap.Finger(handData.fingers[f],this);
-				this.pointableTable[finger.id] = this.fingerTable[finger.id] = finger;
-				this.pointables.push(finger);
-				this.fingers.push(finger);
-			}
-			
-			for(t = 0; t < handData.tools.length; t++){
-				var tool = new Leap.Tool(handData.tools[t],this);
-				this.pointableTable[tool.id] = this.toolTable[tool.id] = tool;
-				this.pointables.push(tool);
-				this.tools.push(tool);
-			}
-			
-			this.direction = (handData.direction==null)?null:new Leap.Vector(handData.direction); // Vector
-			this.palmNormal = (handData.palmNormal==null)?null:new Leap.Vector(handData.palmNormal); // Vector
-			this.palmPosition = (handData.palmPosition==null)?null:new Leap.Vector(handData.palmPosition); // Vector
-			this.palmVelocity = (handData.palmVelocity==null)?null:new Leap.Vector(handData.palmVelocity); // Vector
-			this.sphereCenter = (handData.sphereCenter==null)?null:new Leap.Vector(handData.sphereCenter); // Vector
-			this.sphereRadius = handData.sphereRadius; // Float
-		}
-		else if(handData != null){
-			
-			this.frame = parentFrame; // Frame
-			this.id = handData.id; // Int32
-			
-			for(id = 0; id < handData.fingers.length; id++){
-				if(handData.fingers[id].tool == false){
-					var finger = new Leap.Finger(handData.fingers[id],this);
-					this.pointableTable[finger.id] = this.fingerTable[finger.id] = finger;
-					this.pointables.push(finger);
-					this.fingers.push(finger);
-				}
-				else{
-					var tool = new Leap.Tool(handData.fingers[id],this);
-					this.pointableTable[tool.id] = this.toolTable[tool.id] = tool;
-					this.pointables.push(tool);
-					this.tools.push(tool);
-				}
-			}
-			
-			if(handData.palm != null){
-				this.direction = new Leap.Vector(handData.palm.direction); // Vector
-				this.palmNormal = new Leap.Vector(handData.palm.normal); // Vector
-				this.palmPosition = new Leap.Vector(handData.palm.position); // Vector
-				this.palmVelocity = new Leap.Vector(handData.palm.velocity); // Vector
-				if(handData.palm.ball != null){
-					this.sphereCenter = new Leap.Vector(handData.palm.ball.center); // Vector
-					this.sphereRadius = handData.palm.ball.radius; // Float
-				}
-			}
-		}
-		else{
-		
-			this.frame = null; // Frame
-			this.id = null; // Int32
-			this.direction = new Leap.Vector(); // Vector
-			this.palmNormal = new Leap.Vector(); // Vector
-			this.palmPosition = new Leap.Vector(); // Vector
-			this.palmVelocity = new Leap.Vector(); // Vector
-			this.sphereCenter = new Leap.Vector(); // Vector
-			this.sphereRadius = null; // Float
-		}
-	},
-	
-	HandList : function(other){
-		
-		if(other instanceof Leap.HandList) this.append(other);
-	},
-
-	Finger : function(fingerData, parentHand){
-
-		Leap.Pointable(fingerData,parentHand,this);
-		
-		this.isFinger = true; // Bool
-		this.isTool = false; // Bool
-	},
-	
-	FingerList : function(other){
-		
-		if(other instanceof Leap.FingerList) this.append(other);
-	},
-
-	Tool : function(toolData, parentHand){
-		
-		Leap.Pointable(toolData,parentHand,this);
-		
-		this.isFinger = false; // Bool
-		this.isTool = true; // Bool
-	},
-	
-	ToolList : function(other){
-		
-		if(other instanceof Leap.ToolList) this.append(other);
-	},
-
-	Pointable : function(pointableData, parentHand, obj){
-		
-		if(obj==null) obj = this;
-		
-		if(pointableData instanceof Leap.Finger || pointableData instanceof Leap.Tool){
-			obj.frame = pointableData.hand.frame; // Frame
-			obj.hand = pointableData.hand; // Hand
-			obj.id = pointableData.id; // Int32
-			
-			obj.direction = new Leap.Vector(pointableData.direction); // Vector direction
-			obj.tipPosition = new Leap.Vector(pointableData.tipPosition); // Vector
-			obj.tipVelocity = new Leap.Vector(pointableData.tipVelocity); // Vector
-			
-			obj.length = pointableData.length; // Float
-			obj.width = pointableData.width; // Float
-		}
-		else if(pointableData != null){
-			obj.frame = parentHand.frame; // Frame
-			obj.hand = parentHand; // Hand
-			obj.id = pointableData.id; // Int32
-			
-			obj.direction = new Leap.Vector(pointableData.tip.direction); // Vector direction
-			obj.tipPosition = new Leap.Vector(pointableData.tip.position); // Vector
-			obj.tipVelocity = new Leap.Vector(pointableData.tip.velocity); // Vector
-			
-			obj.length = pointableData.length; // Float
-			obj.width = pointableData.width; // Float
-		}
-		else{
-			obj.frame = null; // Frame
-			obj.hand = null; // Hand
-			obj.id = null; // Int32
-			
-			obj.direction = new Leap.Vector(); // Vector direction
-			obj.tipPosition = new Leap.Vector(); // Vector
-			obj.tipVelocity = new Leap.Vector(); // Vector
-			
-			obj.length = null; // Float
-			obj.width = null; // Float
-		}
-	},
-	
-	PointableList : function(other){
-		
-		if(other instanceof Leap.PointableList) this.append(other);
-	},
-
-	Vector : function(data){
-		
-		if(data instanceof Leap.Vector){
-			this.x = data.x;
-			this.y = data.y;
-			this.z = data.z;
-		}
-		else if(data != null){
-			this.x = (typeof(data[0]) == "number")?data[0]:0; // Float
-			this.y = (typeof(data[1]) == "number")?data[1]:0; // Float
-			this.z = (typeof(data[2]) == "number")?data[2]:0; // Float
-		}
-		else{
-			this.x = 0;
-			this.y = 0;
-			this.z = 0;
-		}
-	},
-	
-	Matrix : function(data){
-	
-		if(data instanceof Leap.Matrix){
-			this.xBasis = new Leap.Vector(data.xBasis);
-			this.yBasis = new Leap.Vector(data.yBasis);
-			this.zBasis = new Leap.Vector(data.zBasis);
-			this.origin = new Leap.Vector(data.origin);
-		}
-		else if(data[0] instanceof Leap.Vector && typeof(data[1]) == "number"){
-			this.setRotation(data[0],data[1]);
-			this.origin = new Leap.Vector((data[2] instanceof Leap.Vector)?data[2]:[0,0,0]);
-		}
-		else{
-			this.xBasis = new Leap.Vector((data[0] instanceof Leap.Vector)?data[0]:[1,0,0]);
-			this.yBasis = new Leap.Vector((data[1] instanceof Leap.Vector)?data[1]:[0,1,0]);
-			this.zBasis = new Leap.Vector((data[2] instanceof Leap.Vector)?data[2]:[0,0,1]);
-			this.origin = new Leap.Vector((data[3] instanceof Leap.Vector)?data[3]:[0,0,0]);
-		}
+		this._socket.onerror = function(event){ 
+			this.onclose(event);
+		};
 	}
-}
+};
 
 Leap.Controller.prototype = {
 	
-	frame : function(index){
-		if(index == null) return this.frames[this.frames.length-1];
-		if(index < this.frames.length)
-			return this.frames[this.frames.length-index-1];
+	isConnected : function(){
+		return this._socket.connected;
 	},
 	
-	getListenerId : function(){
-		var val = this.listenerId;
-		this.listenerId++;
-		return val;
+	frame : function(index){
+		if(index == null) return this._frames[this._frames.length-1];
+		if(index < this._frames.length)
+			return this._frames[this._frames.length-index-1];
 	},
 	
 	addListener : function(listener){
-		listener.id = this.getListenerId();
-		this.listeners[listener.id] = listener;
+		listener._id = this._listenerId++;
+		this._listeners[listener._id] = listener;
 		listener.onInit(this);
 	},
 	
 	removeListener : function(listener){
 		listener.onExit(this);
-		this.listeners[listener.id].onExit(this);
-		delete this.listeners[listener.id];
+		this._listeners[listener._id].onExit(this);
+		delete this._listeners[listener._id];
+	},
+	
+	config : function(){
+		// Requires additional data form WebSocket server
+	},
+	
+	calibratedScreens : function(){
+		// Requires additional data from WebSocket server
+	},
+	
+	_onmessage : function(event){
+		
+		var eventData = JSON.parse(event.data);
+		var newFrame = new Leap.Frame(eventData);
+		this._frames.push(newFrame);
+		for(index in this._listeners)
+			this._listeners[index].onFrame(this);
 	}
-}
+};
+Leap.Frame = function(frameData){
+
+	this._fingers = new Leap.FingerList();
+	this._tools = new Leap.ToolList();
+	this._pointables = new Leap.PointableList();
+	this._hands = new Leap.HandList();
+	
+	this._fingerTable = {};
+	this._toolTable = {};
+	this._pointableTable = {};
+	this._handTable = {};
+
+	if(frameData == null){
+		this._id = null;
+		this._timestamp = null;
+		this._valid = false;
+		
+		this._r = new Leap.Matrix();
+		this._s = null;
+		this._t = new Leap.Vector();
+	}
+	else{
+		this._id = frameData.id;
+		this._timestamp = frameData.timestamp;
+		this._valid = true;
+		
+		this._r = new Leap.Matrix(frameData.r);
+		this._s = frameData.s;
+		this._t = new Leap.Vector(frameData.t);
+		
+		for(index in frameData.hands){
+		
+			var newHand = new Leap.Hand(frameData.hands[index],this)
+			this._handTable[newHand._id] = newHand;
+			this._hands.push(newHand);
+		}
+		
+		for(index in frameData.pointables){
+			var hand = this._handTable[frameData.pointables[index].handId];
+			if(frameData.pointables[index].tool){
+				var pointable = new Leap.Tool(frameData.pointables[index],hand);
+				this._pointableTable[pointable._id] = this._toolTable[pointable._id] = pointable;
+				this._pointables.push(pointable);
+				this._tools.push(pointable);
+				hand._pointableTable[pointable._id] = hand._toolTable[pointable._id] = pointable;
+				hand._pointables.push(pointable);
+				hand._tools.push(pointable);
+			}
+			else{
+				var pointable = new Leap.Finger(frameData.pointables[index],hand);
+				this._pointableTable[pointable._id] = this._fingerTable[pointable._id] = pointable;
+				this._pointables.push(pointable);
+				this._fingers.push(pointable);
+				hand._pointableTable[pointable._id] = hand._fingerTable[pointable._id] = pointable;
+				hand._pointables.push(pointable);
+				hand._fingers.push(pointable);
+			}
+		}
+	}
+};
 
 Leap.Frame.prototype = {
 	
+	id : function(){
+		return this._id;
+	},
+	
+	timestamp : function(){
+		return this._timestamp;
+	},
+	
+	rotationAngle : function(sinceFrame, axis){
+		// TODO
+	},
+	
+	rotationAxis : function(sinceFrame){
+		// TODO
+	},
+	
+	rotationMatrix : function(sinceFrame){
+		// TODO
+	},
+	
+	scaleFactor : function(sinceFrame){
+		// TODO
+	},
+	
+	translation : function(sinceFrame){
+		// TODO
+	},
+	
+	finger : function(id){
+		if(this._fingerTable[id]==null) return Leap.Finger.invalid();
+		return this._fingers[id];
+	},
+	
+	fingers : function(){
+		return this._fingers;
+	},
+	
+	hand : function(id){
+		if(this._handTable[id]==null) return Leap.Hand.invalid();
+		return this._handTable[id];
+	},
+	
+	hands : function(){
+		return this._hands;
+	},
+	
+	pointable : function(id){
+		if(this._pointableTable[id]==null) return Leap.Pointable.invalid();
+		return this._pointableTable[id];
+	},
+	
+	pointables : function(){
+		return this._pointables;
+	},
+	
+	tool : function(id){
+		if(this._toolTable[id]==null) return Leap.Tool.invalid();
+		return this._toolTable[id];
+	},
+	
+	pointables : function(){
+		return this._pointables;
+	},
+	
+	compare : function(other){
+		return this._id==other.id;
+	},
+	
 	toString : function(){
-		var val = "{timestamp:"+this.timestamp+",id:"+this.id+",hands:[";
-		for(var i=0; i < this.hands.length; i++) val += this.hands[i].toString();
+		var val = "{timestamp:"+this._timestamp+",id:"+this._id+",hands:[";
+		for(var i=0; i < this._hands.length; i++) val += this._hands[i].toString();
 		val += "]}";
 		return val;
 	},
 	
-	isValid : true, // Bool
+	isValid : function(){ return this._valid; }
+};
+
+Leap.Frame.invalid = function(){
+	return new Leap.Frame();
+};
+Leap.Hand = function(handData, parentFrame){
 	
-	finger : function(id){ // Finger finger(Int32 id)
-		if(this.fingerTable[id]==null) return {isValid:false};
-		return this.fingers[id];
-	},
+	this._fingers = new Leap.FingerList();
+	this._tools = new Leap.ToolList();
+	this._pointables = new Leap.PointableList();
 	
-	hand : function(id){ // Hand hand(id)
-		if(this.handTable[id]==null) return {isValid:false};
-		return this.handTable[id];
-	},
+	this._fingerTable = {};
+	this._toolTable = {};
+	this._pointableTable = {};
 	
-	pointable : function(id){ // Pointable pointable(id)
-		if(this.pointableTable[id]==null) return {isValid:false};
-		return this.pointableTable[id];
-	},
+	if(handData == null){
 	
-	tool : function(id){ // Tool tool(id)
-		if(this.toolTable[id]==null) return {isValid:false};
-		return this.toolTable[id];
+		this._frame = null;
+		this._id = null;
+		this._valid = false;
+		
+		this._r = new Leap.Matrix();
+		this._s = null;
+		this._t = new Leap.Vector();
+		
+		this._direction = new Leap.Vector();
+		this._palmNormal = new Leap.Vector();
+		this._palmPosition = new Leap.Vector();
+		this._palmVelocity = new Leap.Vector();
+		this._sphereCenter = new Leap.Vector();
+		this._sphereRadius = null;
 	}
-}
+	else{
+		
+		this._frame = parentFrame;
+		this._id = handData.id;
+		this._valid = true;
+		
+		this._r = new Leap.Matrix(handData.r);
+		this._s = handData.s;
+		this._t = new Leap.Vector(handData.t);
+		
+		this._direction = new Leap.Vector(handData.direction);
+		this._palmNormal = new Leap.Vector(handData.palmNormal);
+		this._palmPosition = new Leap.Vector(handData.palmPosition);
+		this._palmVelocity = new Leap.Vector(handData.palmVelocity);
+		this._sphereCenter = new Leap.Vector(handData.sphereCenter);
+		this._sphereRadius = handData.sphereRadius;
+	}
+};
 
 Leap.Hand.prototype = {
 	
+	frame : function(){
+		return this._frame;
+	},
+	
+	id : function(){
+		return this._id;
+	},
+	
+	direction : function(){
+		return this._direction;
+	},
+	
+	palmNormal : function(){
+		return this._palmNormal;
+	},
+	
+	palmPosition : function(){
+		return this._palmPosition;
+	},
+	
+	palmVelocity : function(){
+		return this._palmVelocity;
+	},
+	
+	sphereCenter : function(){
+		return this._sphereCenter;
+	},
+	
+	sphereRadius : function(){
+		return this._sphereRadius;
+	},
+	
+	rotationAngle : function(sinceFrame, axis){
+		// TODO
+	},
+	
+	rotationAxis : function(sinceFrame){
+		// TODO
+	},
+	
+	rotationMatrix : function(sinceFrame){
+		// TODO
+	},
+	
+	scaleFactor : function(sinceFrame){
+		// TODO
+	},
+	
+	translation : function(sinceFrame){
+		// TODO
+	},
+	
+	finger : function(id){
+		if(this._fingerTable[id]==null) return Leap.Finger.invalid();
+		return this._fingerTable[id];
+	},
+	
+	fingers : function(){
+		return this._fingers;
+	},
+	
+	pointable : function(id){
+		if(this._pointableTable[id]==null) return Leap.Pointable.invalid();
+		return this._pointableTable[id];
+	},
+	
+	pointables : function(){
+		return this._pointables;
+	},
+	
+	tool : function(id){
+		if(this._toolTable[id]==null) return {isValid:false};
+		return this._toolTable[id];
+	},
+	
+	tools : function(){
+		return this._tools;
+	},
+	
 	toString : function(){
-		var val = "{id:"+this.id+",sphereCenter:"+(this.sphereCenter==null?"null":this.sphereCenter)+",";
-		val += "sphereRadius:"+(this.sphereRadius==null?"null":this.sphereRadius)+",";
-		val += "normal:"+(this.normal==undefined?"null":this.normal.toString())+",fingers:[";
-		for(var i=0; i < this.fingers.length; i++) val += this.fingers[i].toString();
+		var val = "{id:"+obj._id+",sphereCenter:"+(obj._sphereCenter==null?"null":obj._sphereCenter)+",";
+		val += "sphereRadius:"+(obj._sphereRadius==null?"null":obj._sphereRadius)+",";
+		val += "normal:"+(obj._normal==undefined?"null":obj._normal.toString())+",fingers:[";
+		for(var i=0; i < this._fingers.length; i++) val += this._fingers[i].toString();
 		val += "],tools:[";
-		for(var i=0; i < this.tools.length; i++) val += this.tools[i].toString();
-		val += "],palmNormal:"+(this.palmNormal==undefined?"null":this.palmNormal.toString())+",";
-		val += "palmPosition:"+(this.palmPosition==undefined?"null":this.palmPosition.toString())+",";
-		val += "palmVelocity:"+(this.palmVelocity==undefined?"null":this.palmVelocity.toString())+"}";
+		for(var i=0; i < this._tools.length; i++) val += this._tools[i].toString();
+		val += "],palmNormal:"+(obj._palmNormal==undefined?"null":obj._palmNormal.toString())+",";
+		val += "palmPosition:"+(obj._palmPosition==undefined?"null":obj._palmPosition.toString())+",";
+		val += "palmVelocity:"+(obj._palmVelocity==undefined?"null":obj._palmVelocity.toString())+"}";
 		return val;
 	},
 	
-	isValid : true, // Bool
-	
-	finger : function(id){ // Finger finger(Int32 id)
-		if(this.fingerTable[id]==null) return {isValid:false};
-		return this.fingerTable[id];
-	},
-	
-	pointable : function(id){ // Pointable pointable(id)
-		if(this.pointableTable[id]==null) return {isValid:false};
-		return this.pointableTable[id];
-	},
-	
-	tool : function(id){ // Tool tool(id)
-		if(this.toolTable[id]==null) return {isValid:false};
-		return this.toolTable[id];
+	isValid : function(){
+		return this._valid;
 	}
-}
+};
+
+Leap.Hand.invalid = function(){
+	return new Leap.Hand();
+};
+Leap.HandList = function(){};
 
 Leap.HandList.prototype = new Array;
+
 Leap.HandList.prototype.append = function(other){
-	for(i=0; i<other.length; i++) this.push(new Leap.Hand(other[i]));
+
+	for(i = 0; i < other.length; i++) this.push(new Leap.Hand(other[i]));
 };
+
 Leap.HandList.prototype.count = function(){
+
 	return this.length;
 };
+
 Leap.HandList.prototype.empty = function(){
-	return this.length>0;
+
+	return this.length > 0;
 };
-
-Leap.Finger.prototype = {
-
-	isValid : true, // Bool
+Leap.Listener = function(){
 	
-	toString : function(){
-		var val = "{id:"+this.id+",direction:"+this.direction.toString()+",";
-		val += "tipPosition:"+this.tipPosition.toString()+",";
-		val += "tipVelocity:"+this.tipVelocity.toString()+",";
-		val += "length:"+this.length+",";
-		val += "width:"+this.width+"}";
-		return val;
+	this.onConnect = function(controller){};
+	this.onDisconnect = function(controller){};
+	this.onExit = function(controller){};
+	this.onFrame = function(controller){};
+	this.onInit = function(controller){};
+};
+Leap.Matrix = function(data){
+	
+	if(data instanceof Leap.Matrix){
+		this.xBasis = new Leap.Vector(data.xBasis);
+		this.yBasis = new Leap.Vector(data.yBasis);
+		this.zBasis = new Leap.Vector(data.zBasis);
+		this.origin = new Leap.Vector(data.origin);
 	}
-}
-
-Leap.FingerList.prototype = new Array;
-Leap.FingerList.prototype.append = function(other){
-	for(i=0; i<other.length; i++) this.push(new Leap.Finger(other[i]));
-};
-Leap.FingerList.prototype.count = function(){
-	return this.length;
-};
-Leap.FingerList.prototype.empty = function(){
-	return this.length>0;
-};
-
-Leap.Tool.prototype = {
-
-	isValid : true, // Bool
-	
-	toString : function(){
-		var val = "{id:"+this.id+",direction:"+this.direction.toString()+",";
-		val += "tipPosition:"+this.tipPosition.toString()+",";
-		val += "tipVelocity:"+this.tipVelocity.toString()+",";
-		val += "length:"+this.length+",";
-		val += "width:"+this.width+"}";
-		return val;
+	else if(data instanceof Array){
+		if(data[0] instanceof Leap.Vector && typeof(data[1]) == "number"){
+			this.setRotation(data[0],data[1]);
+			this.origin = new Leap.Vector(data[2]);
+		}
+		else{
+			this.xBasis = new Leap.Vector(data[0]);
+			this.yBasis = new Leap.Vector(data[1]);
+			this.zBasis = new Leap.Vector(data[2]);
+			this.origin = new Leap.Vector(data[3]);
+		}
 	}
-}
-
-Leap.ToolList.prototype = new Array;
-Leap.ToolList.prototype.append = function(other){
-	for(i=0; i<other.length; i++) this.push(new Leap.Tool(other[i]));
-};
-Leap.ToolList.prototype.count = function(){
-	return this.length;
-};
-Leap.ToolList.prototype.empty = function(){
-	return this.length>0;
-};
-
-Leap.Pointable.prototype = {
-
-	isValid : true, // Bool
-	
-	toString : function(){
-		var val = "{id:"+this.id+",direction:"+this.direction.toString()+",";
-		val += "tipPosition:"+this.tipPosition.toString()+",";
-		val += "tipVelocity:"+this.tipVelocity.toString()+",";
-		val += "length:"+this.length+",";
-		val += "width:"+this.width+"}";
-		return val;
+	else{
+		this.xBasis = new Leap.Vector([1,0,0]);
+		this.yBasis = new Leap.Vector([0,1,0]);
+		this.zBasis = new Leap.Vector([0,0,1]);
+		this.origin = new Leap.Vector([0,0,0]);
 	}
-}
-
-Leap.PointableList.prototype = new Array;
-Leap.PointableList.prototype.append = function(other){
-	for(i=0; i<other.length; i++) this.push(new Leap.Pointable(other[i]));
 };
-Leap.PointableList.prototype.count = function(){
-	return this.length;
-};
-Leap.PointableList.prototype.empty = function(){
-	return this.length>0;
-};
-
-Leap.Vector.prototype = {
-	
-	angleTo : function(other){ // Float
-		var denom = this.magnitude()*other.magnitude();
-		if(denom > 0) return Math.acos(this.dot(other)/denom);
-		else return 0;
-	},
-	
-	cross : function(other){ // Vector cross(Vector other)
-		var x = this.y*other.z-other.y*this.z;
-		var y = this.x*other.z-other.x*this.z;
-		var z = this.x*other.y-other.x*this.y;
-		return new Leap.Vector([x,y,z]);
-	},
-	
-	distanceTo : function(other){ // Float distanceTo(Vector other)
-		return this.minus(other).magnitude();
-	},
-	
-	dot : function(other){ // Float dot(Vector other)
-		return this.x*other.x+this.y*other.y+this.z*other.z;
-	},
-	
-	plus : function(other){ // Vector plus(Vector other)
-		return new Leap.Vector([this.x+other.x,this.y+other.y,this.z+other.z]);
-	},
-	
-	minus : function(other){ // Vector minus(Vector other)
-		return new Leap.Vector([this.x-other.x,this.y-other.y,this.z-other.z]);
-	},
-	
-	multiply : function(scalar){ // Vector multiply(Float scalar)
-		return new Leap.Vector([this.x*scalar,this.y*scalar,this.z*scalar]);
-	},
-	
-	dividedBy : function(scalar){ // Vector dividedBy(Float scalar)
-		return new Leap.Vector([this.x/scalar,this.y/scalar,this.z/scalar]);
-	},
-	
-	magnitude : function(){ // Float
-		return Math.sqrt(this.magnitudeSquared());
-	},
-	
-	magnitudeSquared : function(){ // Float
-		return Math.pow(this.x,2)+Math.pow(this.y,2)+Math.pow(this.z,2);
-	},
-	
-	normalized : function(){ // Vector
-		var magnitude = this.magnitude();
-		if(magnitude > 0) return this.dividedBy(magnitude);
-		else return new Leap.Vector();
-	},
-	
-	pitch : function(){ // Float
-		//var proj = new Leap.Vector([0,this.y,this.z]);
-		//return Leap.vectors.forward().angleTo(proj);
-		return Math.atan2(this.y, -this.z);
-	},
-	
-	roll : function(){ // Float
-		//var proj = new Leap.Vector([this.x,this.y,0]);
-		//return Leap.vectors.down().angleTo(proj);
-		return Math.atan2(this.x, -this.y);
-	},
-	
-	yaw : function(){ // Float
-		//var proj = new Leap.Vector([this.x,0,this.z]);
-		//return Leap.vectors.forward().angleTo(proj);
-		return Math.atan2(this.x, -this.z);
-	},
-	
-	toString : function(){
-		return "{x:"+this.x+",y:"+this.y+",z:"+this.z+"}";
-	},
-	
-	compare : function(other){
-		return this.x==other.x && this.y==other.y && this.z==other.z;
-	}
-}
 
 Leap.Matrix.prototype = {
 	
@@ -607,6 +449,15 @@ Leap.Matrix.prototype = {
 		var z = this.transformDirection(other.zBasis);
 		var o = this.transformPoint(other.origin);
 		return new Leap.Matrix([x,y,z,o]);
+	},
+	
+	rigidInverse : function(){
+		var x = new Leap.Vector([this.xBasis.x, this.yBasis.x, this.zBasis.x]);
+		var y = new Leap.Vector([this.xBasis.y, this.yBasis.y, this.zBasis.y]);
+		var z = new Leap.Vector([this.xBasis.z, this.yBasis.z, this.zBasis.z]);
+		var rotInverse = new Leap.Matrix([x,y,z]);
+		rotInverse.origin = rotInverse.transformDirection(Leap.Vector.zero().minus(this.origin));
+		return rotInverse;
 	},
 	
 	toArray3x3 : function(output){
@@ -657,7 +508,277 @@ Leap.Matrix.prototype = {
 		this.zBasis.compare(other.zBasis) && 
 		this.origin.compare(other.origin);
 	}
-}
+};
+
+Leap.Matrix.identity = function(){ return new Leap.Matrix(); };
+Leap.Pointable = function(pointableData, parentHand, obj){
+	
+	if(obj==null) obj = this;
+	
+	if(pointableData == null){
+	
+		obj._frame = null;
+		obj._hand = null;
+		obj._id = null;
+		obj._valid = false;
+		
+		obj._direction = new Leap.Vector();
+		obj._tipPosition = new Leap.Vector();
+		obj._tipVelocity = new Leap.Vector();
+		
+		obj._length = null;
+		obj._width = null;
+	}
+	else{
+		
+		obj._frame = parentHand._frame;
+		obj._hand = parentHand;
+		obj._id = pointableData.id;
+		obj._valid = true;
+		
+		obj._direction = new Leap.Vector(pointableData.direction);
+		obj._tipPosition = new Leap.Vector(pointableData.tipPosition);
+		obj._tipVelocity = new Leap.Vector(pointableData.tipVelocity);
+		
+		obj._length = pointableData.length;
+		obj._width = pointableData.width;
+	}
+};
+
+Leap.Pointable.prototype = {
+
+	frame : function(){
+		return this._frame;
+	},
+	
+	hand : function(){
+		return this._hand;
+	},
+	
+	id : function(){
+		return this._id;
+	},
+	
+	direction : function(){
+		return this._direction;
+	},
+	
+	tipPosition : function(){
+		return this._tipPosition;
+	},
+	
+	tipVelocity : function(){
+		return this._tipVelocity;
+	},
+	
+	length : function(){
+		return this._length;
+	},
+	
+	width : function(){
+		return this._width;
+	},
+	
+	toString : function(){
+		var val = "{id:"+this._id+",direction:"+this._direction.toString()+",";
+		val += "tipPosition:"+this._tipPosition.toString()+",";
+		val += "tipVelocity:"+this._tipVelocity.toString()+",";
+		val += "length:"+this._length+",";
+		val += "width:"+this._width+"}";
+		return val;
+	},
+	
+	isValid : function(){
+		return this._valid;
+	}
+};
+
+Leap.Pointable.invalid = function(){
+	return new Leap.Pointable();
+};
+
+Leap.Finger = function(fingerData, parentHand){
+	
+	Leap.Pointable(fingerData, parentHand, this);
+	
+	this._isFinger = true;
+	this._isTool = false;
+};
+
+Leap.Finger.prototype = Leap.Pointable.prototype;
+
+Leap.Finger.invalid = function(){
+	return new Leap.Finger();
+};
+
+Leap.Tool = function(toolData, parentHand){
+
+	Leap.Pointable(toolData, parentHand, this);
+	
+	this._isTool = true;
+	this._isFinger = false;
+};
+
+Leap.Tool.prototype = Leap.Pointable.prototype;
+
+Leap.Tool.invalid = function(){
+	return new Leap.Tool();
+};
+Leap.PointableList = function(){};
+
+Leap.PointableList.prototype = new Array;
+
+Leap.PointableList.prototype.append = function(other){
+	for(i=0; i<other.length; i++) this.push(new Leap.Pointable(other[i]));
+};
+
+Leap.PointableList.prototype.count = function(){
+	return this.length;
+};
+
+Leap.PointableList.prototype.empty = function(){
+	return this.length>0;
+};
+
+Leap.FingerList = function(){};
+
+Leap.FingerList.prototype = new Array;
+
+Leap.FingerList.prototype.append = function(other){
+	for(i = 0; i < other.length; i++) this.push(new Leap.Finger(other[i]));
+};
+
+Leap.FingerList.prototype.count = function(){
+	return this.length;
+};
+
+Leap.FingerList.prototype.empty = function(){
+	return this.length > 0;
+};
+
+Leap.ToolList = function(){};
+
+Leap.ToolList.prototype = new Array;
+
+Leap.ToolList.prototype.append = function(other){
+	for(i=0; i<other.length; i++) this.push(new Leap.Tool(other[i]));
+};
+
+Leap.ToolList.prototype.count = function(){
+	return this.length;
+};
+
+Leap.ToolList.prototype.empty = function(){
+	return this.length>0;
+};
+Leap.Vector = function(data){
+	
+	if(data instanceof Leap.Vector){
+		this.x = data.x;
+		this.y = data.y;
+		this.z = data.z;
+	}
+	else if(data != null){
+		this.x = (typeof(data[0]) == "number")?data[0]:0;
+		this.y = (typeof(data[1]) == "number")?data[1]:0;
+		this.z = (typeof(data[2]) == "number")?data[2]:0;
+	}
+	else{
+		this.x = 0;
+		this.y = 0;
+		this.z = 0;
+	}
+};
+
+Leap.Vector.prototype = {
+	
+	angleTo : function(other){
+		var denom = this.magnitude()*other.magnitude();
+		if(denom > 0) return Math.acos(this.dot(other)/denom);
+		else return 0;
+	},
+	
+	cross : function(other){
+		var x = this.y*other.z - other.y*this.z;
+		var y = this.x*other.z - other.x*this.z;
+		var z = this.x*other.y - other.x*this.y;
+		return new Leap.Vector([x,y,z]);
+	},
+	
+	distanceTo : function(other){
+		return this.minus(other).magnitude();
+	},
+	
+	dot : function(other){
+		return this.x*other.x + this.y*other.y + this.z*other.z;
+	},
+	
+	plus : function(other){
+		return new Leap.Vector([this.x + other.x,this.y + other.y,this.z + other.z]);
+	},
+	
+	minus : function(other){
+		return new Leap.Vector([this.x - other.x,this.y - other.y,this.z - other.z]);
+	},
+	
+	multiply : function(scalar){
+		return new Leap.Vector([this.x*scalar,this.y*scalar,this.z*scalar]);
+	},
+	
+	dividedBy : function(scalar){
+		return new Leap.Vector([this.x/scalar,this.y/scalar,this.z/scalar]);
+	},
+	
+	magnitude : function(){
+		return Math.sqrt(this.magnitudeSquared());
+	},
+	
+	magnitudeSquared : function(){
+		return Math.pow(this.x,2) + Math.pow(this.y,2) + Math.pow(this.z,2);
+	},
+	
+	normalized : function(){
+		var magnitude = this.magnitude();
+		if(magnitude > 0) return this.dividedBy(magnitude);
+		else return new Leap.Vector();
+	},
+	
+	pitch : function(){
+		//var proj = new Leap.Vector([0,this.y,this.z]);
+		//return Leap.vectors.forward().angleTo(proj);
+		return Math.atan2(this.y, -this.z);
+	},
+	
+	roll : function(){
+		//var proj = new Leap.Vector([this.x,this.y,0]);
+		//return Leap.vectors.down().angleTo(proj);
+		return Math.atan2(this.x, -this.y);
+	},
+	
+	yaw : function(){
+		//var proj = new Leap.Vector([this.x,0,this.z]);
+		//return Leap.vectors.forward().angleTo(proj);
+		return Math.atan2(this.x, -this.z);
+	},
+	
+	toArray : function(){
+		return [this.x, this.y, this.z];
+	},
+	
+	toString : function(){
+		return "{x:"+this.x+",y:"+this.y+",z:"+this.z+"}";
+	},
+	
+	compare : function(other){
+		return this.x==other.x && this.y==other.y && this.z==other.z;
+	},
+	
+	isValid : function(){
+		return (this.x != NaN && this.x > -Infinity && this.x < Infinity) &&
+			   (this.y != NaN && this.y > -Infinity && this.y < Infinity) &&
+			   (this.z != NaN && this.z > -Infinity && this.z < Infinity);
+	}
+};
 
 Leap.Vector.backward = function(){ return new Leap.Vector([0,0,1]); };
 Leap.Vector.down = function(){ return new Leap.Vector([0,-1,0]); };
@@ -669,5 +790,3 @@ Leap.Vector.xAxis = function(){ return new Leap.Vector([1,0,0]); };
 Leap.Vector.yAxis = function(){ return new Leap.Vector([0,1,0]); };
 Leap.Vector.zAxis = function(){ return new Leap.Vector([0,0,1]); };
 Leap.Vector.zero = function(){ return new Leap.Vector([0,0,0]); };
-
-Leap.Matrix.identity = function(){ return new Leap.Matrix(); };
