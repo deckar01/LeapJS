@@ -20,6 +20,7 @@ function drawFinger(finger){
 	context1.lineTo(x-finger.direction().z*20, y-finger.direction().y*20);
 	context1.strokeStyle = 'red';
 	context1.stroke();
+	
 	context1.beginPath();
 	context1.arc(x, y, radius, 0, 2 * Math.PI, false);
 	context1.fillStyle = 'rgba(255,255,255,.3)';
@@ -31,12 +32,13 @@ function drawFinger(finger){
 	
 	radius = 10;
 	x = finger.tipPosition().x + 250;
-	y = finger.tipPosition().z + 50;
+	y = finger.tipPosition().z + 250;
 	context2.beginPath();
 	context2.moveTo(x, y);
 	context2.lineTo(x+finger.direction().x*20, y+finger.direction().z*20);
 	context2.strokeStyle = 'red';
 	context2.stroke();
+	
 	context2.beginPath();
 	context2.arc(x, y, radius, 0, 2 * Math.PI, false);
 	context2.fillStyle = 'rgba(255,255,255,.3)';
@@ -67,7 +69,7 @@ function drawTool(tool){
 	
 	radius = 5;
 	x = tool.tipPosition.x + 250;
-	y = tool.tipPosition.z + 50;
+	y = tool.tipPosition.z + 250;
 	
 	context2.beginPath();
 	context2.moveTo(x, y);
@@ -90,6 +92,7 @@ function drawHand(hand){
 		var radius = hand.sphereRadius();
 		var x = 400-(hand.sphereCenter().z + 50);
 		var y = 600-(hand.sphereCenter().y);
+		
 		context1.beginPath();
 		context1.arc(x, y, radius, 0, 2 * Math.PI, false);
 		context1.fillStyle = 'rgba(255,255,255,.3)';
@@ -101,7 +104,8 @@ function drawHand(hand){
 		
 		radius = hand.sphereRadius();
 		x = hand.sphereCenter().x + 250;
-		y = hand.sphereCenter().z + 50;
+		y = hand.sphereCenter().z + 250;
+		
 		context2.beginPath();
 		context2.arc(x, y, radius, 0, 2 * Math.PI, false);
 		context2.fillStyle = 'rgba(255,255,255,.3)';
@@ -114,7 +118,7 @@ function drawHand(hand){
 
 function fade(){
 	context1.fillStyle = 'rgba(255,255,255,.3)';
-	context1.fillRect(0,0,400,600);
+	context1.fillRect(0,0,600,600);
 	context2.fillStyle = 'rgba(255,255,255,.3)';
-	context2.fillRect(0,0,500,400);
+	context2.fillRect(0,0,500,600);
 }
