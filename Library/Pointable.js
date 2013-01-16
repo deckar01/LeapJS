@@ -18,7 +18,7 @@ Leap.Pointable = function(pointableData, parentHand, obj){
 	}
 	else{
 		
-		obj._frame = parentHand._frame;
+		obj._frame = (parentHand)?parentHand._frame:null;
 		obj._hand = parentHand;
 		obj._id = pointableData.id;
 		obj._valid = true;

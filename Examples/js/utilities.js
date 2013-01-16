@@ -12,9 +12,9 @@ function realTime(timestamp){
 }
 
 function drawFinger(finger){
-	var radius = 20;
-	var x = 300-(finger.tipPosition().z + 50);
-	var y = 300-(finger.tipPosition().y);
+	var radius = 10;
+	var x = 400-(finger.tipPosition().z + 50);
+	var y = 600-(finger.tipPosition().y);
 	context1.beginPath()
 	context1.moveTo(x, y);
 	context1.lineTo(x-finger.direction().z*20, y-finger.direction().y*20);
@@ -29,8 +29,8 @@ function drawFinger(finger){
 	context1.stroke();
 	
 	
-	radius = 20;
-	x = finger.tipPosition().x + 200;
+	radius = 10;
+	x = finger.tipPosition().x + 250;
 	y = finger.tipPosition().z + 50;
 	context2.beginPath();
 	context2.moveTo(x, y);
@@ -47,8 +47,8 @@ function drawFinger(finger){
 }
 
 function drawTool(tool){
-	var x = 300-(tool.tipPosition().z + 50);
-	var y = 300-(tool.tipPosition().y);
+	var x = 400-(tool.tipPosition().z + 50);
+	var y = 600-(tool.tipPosition().y);
 	
 	context1.beginPath();
 	context1.lineWidth = 1;
@@ -66,7 +66,7 @@ function drawTool(tool){
 	
 	
 	radius = 5;
-	x = tool.tipPosition.x + 200;
+	x = tool.tipPosition.x + 250;
 	y = tool.tipPosition.z + 50;
 	
 	context2.beginPath();
@@ -86,10 +86,10 @@ function drawTool(tool){
 
 function drawHand(hand){
 
-	if(hand.sphereRadius != null && Object.keys(hand.fingers).length>0){
+	if(hand.sphereRadius != null){
 		var radius = hand.sphereRadius();
-		var x = 300-(hand.sphereCenter().z + 50);
-		var y = 300-(hand.sphereCenter().y);
+		var x = 400-(hand.sphereCenter().z + 50);
+		var y = 600-(hand.sphereCenter().y);
 		context1.beginPath();
 		context1.arc(x, y, radius, 0, 2 * Math.PI, false);
 		context1.fillStyle = 'rgba(255,255,255,.3)';
@@ -100,7 +100,7 @@ function drawHand(hand){
 		
 		
 		radius = hand.sphereRadius();
-		x = hand.sphereCenter().x + 200;
+		x = hand.sphereCenter().x + 250;
 		y = hand.sphereCenter().z + 50;
 		context2.beginPath();
 		context2.arc(x, y, radius, 0, 2 * Math.PI, false);
@@ -114,7 +114,7 @@ function drawHand(hand){
 
 function fade(){
 	context1.fillStyle = 'rgba(255,255,255,.3)';
-	context1.fillRect(0,0,400,300);
+	context1.fillRect(0,0,400,600);
 	context2.fillStyle = 'rgba(255,255,255,.3)';
-	context2.fillRect(0,0,400,300);
+	context2.fillRect(0,0,500,400);
 }

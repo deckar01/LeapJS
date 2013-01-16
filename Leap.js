@@ -13,7 +13,7 @@ Leap.Controller = function(connection){
 		this._socket = new WebSocket(connection);
 		this._socket._controller = this;
 		
-		this._socket._onmessage = function(event){
+		this._socket.onmessage = function(event){
 			this._controller._onmessage(event);
 		};
 		
@@ -68,10 +68,17 @@ Leap.Controller.prototype = {
 	_onmessage : function(event){
 		
 		var eventData = JSON.parse(event.data);
-		var newFrame = new Leap.Frame(eventData);
-		this._frames.push(newFrame);
-		for(index in this._listeners)
-			this._listeners[index].onFrame(this);
+		if(this._discardVersionFrame(eventData)){
+			var newFrame = new Leap.Frame(eventData);
+			this._frames.push(newFrame);
+			for(index in this._listeners)
+				this._listeners[index].onFrame(this);
+		}
+	},
+	
+	_discardVersionFrame : function(data){
+		if(data.version){ this._discardVersionFrame = function(){return true;}; return false;}
+		else return true;
 	}
 };
 
@@ -119,18 +126,22 @@ Leap.Frame = function(frameData){
 				this._pointableTable[pointable._id] = this._toolTable[pointable._id] = pointable;
 				this._pointables.push(pointable);
 				this._tools.push(pointable);
-				hand._pointableTable[pointable._id] = hand._toolTable[pointable._id] = pointable;
-				hand._pointables.push(pointable);
-				hand._tools.push(pointable);
+				if(hand){
+					hand._pointableTable[pointable._id] = hand._toolTable[pointable._id] = pointable;
+					hand._pointables.push(pointable);
+					hand._tools.push(pointable);
+				}
 			}
 			else{
 				var pointable = new Leap.Finger(frameData.pointables[index],hand);
 				this._pointableTable[pointable._id] = this._fingerTable[pointable._id] = pointable;
 				this._pointables.push(pointable);
 				this._fingers.push(pointable);
-				hand._pointableTable[pointable._id] = hand._fingerTable[pointable._id] = pointable;
-				hand._pointables.push(pointable);
-				hand._fingers.push(pointable);
+				if(hand){
+					hand._pointableTable[pointable._id] = hand._fingerTable[pointable._id] = pointable;
+					hand._pointables.push(pointable);
+					hand._fingers.push(pointable);
+				}
 			}
 		}
 	}
@@ -196,6 +207,10 @@ Leap.Frame.prototype = {
 	tool : function(id){
 		if(this._toolTable[id]==null) return Leap.Tool.invalid();
 		return this._toolTable[id];
+	},
+	
+	tools : function(){
+		return this._tools;
 	},
 	
 	pointables : function(){
@@ -538,7 +553,7 @@ Leap.Pointable = function(pointableData, parentHand, obj){
 	}
 	else{
 		
-		obj._frame = parentHand._frame;
+		obj._frame = (parentHand)?parentHand._frame:null;
 		obj._hand = parentHand;
 		obj._id = pointableData.id;
 		obj._valid = true;

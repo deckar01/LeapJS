@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+	<body>
+		<script src="../Leap.js"></script>
+		
+		<script src="./js/utilities.js"></script>
+		
+		<b>LeapJS Live Demo:</b><br/>
+		<canvas id="canvas1" width="400" height="600" style="border-right: 4px solid blue"></canvas>
+		<canvas id="canvas2" width="500" height="400" style="border-top: 4px solid blue"></canvas><br/>
+		<div id="output"></div>
+		
+		<script type="text/javascript">
+			
+			// Store context for canvas elements
+			var context1 = document.getElementById("canvas1").getContext('2d');
+			var context2 = document.getElementById("canvas2").getContext('2d');
+			
+			// Create a listener that will print frame data when a new frame arrives
+			myListener = new Leap.Listener();
+			myListener.onFrame = function(controller){
+			
+				fade();
+				var o = '';
+				var frame = controller.frame();
+				o += 'id: ' + frame.id() + '<br/>';
+				o += 'timestamp: ' + frame.timestamp() + ' ' + realTime(frame.timestamp()) + '<br/>';
+				for(id = 0; id < frame.hands().count(); id++){
+					var hand = frame.hands()[id];
+					drawHand(hand);
+				}
+				for(tid = 0; tid < frame.tools().count(); tid++){
+					var tool = frame.tools()[tid];
+					drawTool(tool);
+				}
+				for(hid = 0; hid < frame.fingers().count(); hid++){
+					var finger =frame.fingers()[hid];
+					drawFinger(finger);
+				}
+				
+				document.getElementById("output").innerHTML = o;
+			}
+			myListener.onDisconnect = function(controller){
+				document.getElementById("output").innerHTML = 'Device disconnected.';
+			}
+			myListener.onConnect = function(controller){
+				document.getElementById("output").innerHTML = 'Device connected.';
+			}
+			
+			// Create a controller to connect to the Leap Motion
+			myController = new Leap.Controller("ws://localhost:6437/");
+			
+			// Add the listener to the controller
+			myController.addListener(myListener);
+		</script>
+	</body>
+</html>

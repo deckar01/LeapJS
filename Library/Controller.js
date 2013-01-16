@@ -11,7 +11,7 @@ Leap.Controller = function(connection){
 		this._socket = new WebSocket(connection);
 		this._socket._controller = this;
 		
-		this._socket._onmessage = function(event){
+		this._socket.onmessage = function(event){
 			this._controller._onmessage(event);
 		};
 		
@@ -66,9 +66,16 @@ Leap.Controller.prototype = {
 	_onmessage : function(event){
 		
 		var eventData = JSON.parse(event.data);
-		var newFrame = new Leap.Frame(eventData);
-		this._frames.push(newFrame);
-		for(index in this._listeners)
-			this._listeners[index].onFrame(this);
+		if(this._discardVersionFrame(eventData)){
+			var newFrame = new Leap.Frame(eventData);
+			this._frames.push(newFrame);
+			for(index in this._listeners)
+				this._listeners[index].onFrame(this);
+		}
+	},
+	
+	_discardVersionFrame : function(data){
+		if(data.version){ this._discardVersionFrame = function(){return true;}; return false;}
+		else return true;
 	}
 };

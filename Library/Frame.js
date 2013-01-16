@@ -42,18 +42,22 @@ Leap.Frame = function(frameData){
 				this._pointableTable[pointable._id] = this._toolTable[pointable._id] = pointable;
 				this._pointables.push(pointable);
 				this._tools.push(pointable);
-				hand._pointableTable[pointable._id] = hand._toolTable[pointable._id] = pointable;
-				hand._pointables.push(pointable);
-				hand._tools.push(pointable);
+				if(hand){
+					hand._pointableTable[pointable._id] = hand._toolTable[pointable._id] = pointable;
+					hand._pointables.push(pointable);
+					hand._tools.push(pointable);
+				}
 			}
 			else{
 				var pointable = new Leap.Finger(frameData.pointables[index],hand);
 				this._pointableTable[pointable._id] = this._fingerTable[pointable._id] = pointable;
 				this._pointables.push(pointable);
 				this._fingers.push(pointable);
-				hand._pointableTable[pointable._id] = hand._fingerTable[pointable._id] = pointable;
-				hand._pointables.push(pointable);
-				hand._fingers.push(pointable);
+				if(hand){
+					hand._pointableTable[pointable._id] = hand._fingerTable[pointable._id] = pointable;
+					hand._pointables.push(pointable);
+					hand._fingers.push(pointable);
+				}
 			}
 		}
 	}
@@ -119,6 +123,10 @@ Leap.Frame.prototype = {
 	tool : function(id){
 		if(this._toolTable[id]==null) return Leap.Tool.invalid();
 		return this._toolTable[id];
+	},
+	
+	tools : function(){
+		return this._tools;
 	},
 	
 	pointables : function(){
