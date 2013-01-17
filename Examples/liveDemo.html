@@ -16,6 +16,22 @@
 			var context1 = document.getElementById("canvas1").getContext('2d');
 			var context2 = document.getElementById("canvas2").getContext('2d');
 			
+			var buffer1 = document.createElement('canvas');
+			buffer1.width = 600;
+			buffer1.height = 600;
+			var buffercx1 = buffer1.getContext('2d');
+			
+			var buffer2 = document.createElement('canvas');
+			buffer2.width = 600;
+			buffer2.height = 600;
+			var buffercx2 = buffer2.getContext('2d');
+			
+			(function animloop(){
+				requestAnimFrame(animloop);
+				context1.drawImage(buffer1, 0, 0);
+				context2.drawImage(buffer2, 0, 0);
+			})();
+			
 			// Create a listener that will print frame data when a new frame arrives
 			myListener = new Leap.Listener();
 			myListener.onFrame = function(controller){
@@ -25,18 +41,8 @@
 				var frame = controller.frame();
 				o += 'id: ' + frame.id() + '<br/>';
 				o += 'timestamp: ' + frame.timestamp() + ' ' + realTime(frame.timestamp()) + '<br/>';
-				for(id = 0; id < frame.hands().count(); id++){
-					var hand = frame.hands()[id];
-					drawHand(hand);
-				}
-				for(tid = 0; tid < frame.tools().count(); tid++){
-					var tool = frame.tools()[tid];
-					drawTool(tool);
-				}
-				for(hid = 0; hid < frame.fingers().count(); hid++){
-					var finger =frame.fingers()[hid];
-					drawFinger(finger);
-				}
+				
+				drawFrame(frame);
 				
 				document.getElementById("output").innerHTML = o;
 			}

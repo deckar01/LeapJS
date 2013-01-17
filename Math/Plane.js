@@ -9,6 +9,31 @@ var Plane = function(point1, point2, point3){
 	this.point3 = new Leap.Vector(point3);
 }
 
+Plane.prototype.fromNormal(point1, normal){
+	
+	var ortho1 = new Leap.Vector();
+	
+	if(normal.z==0){
+		if(normal.x==0 && normal.y==0) return null;
+		
+		ortho1.x = normal.y;
+		ortho1.y = -normal.x;
+	}
+	else{
+		ortho1.x = normal.z;
+		ortho1.y = normal.z;
+		ortho.z = (normal.x + normal.y);
+	}
+	
+	var ortho2 = normal.cross(ortho1);
+	
+	var plane = new Plane(point1, point1.plus(ortho1), point1.plus(ortho2));
+	plane._normal = new Leap.Vector(normal);
+	plane.normal = function(){ return this._normal; };
+	
+	return plane;
+}
+
 // vector normal()
 Plane.prototype.normal = function(){
 	
@@ -43,7 +68,7 @@ Plane.prototype.unitnormal = function(){
 	return this._unitnormal;
 }
 
-// { vector, float } pointIntersect( vector point )
+// { position: vector, distance: float } pointIntersect( vector point )
 Plane.prototype.pointIntersect = function(point){
 	
     var u = this.unitnormal();
@@ -68,7 +93,7 @@ Plane.prototype._rayIntersectCommon = function(){
 	this._rayIntersectCommon = function(){};
 }
 
-// { vector, float } rayIntersect( vector rayPosition, vector rayDirection )
+// { position: vector, distance: float } rayIntersect( vector rayPosition, vector rayDirection )
 Plane.prototype.rayIntersect = function(rayPosition, rayDirection){
 	
 	this._rayIntersectCommon();
