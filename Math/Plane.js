@@ -86,9 +86,9 @@ Plane.prototype._rayIntersectCommon = function(){
 	this.x13 = this.point1.x - this.point3.x;
 	this.x32 = this.point3.x - this.point2.x;
 	
-	this.yz23 = this.point2.y*point3.z - this.point3.y*point2.z;
-	this.yz13 = this.point1.y*point3.z - this.point3.y*point1.z;
-	this.yz12 = this.point1.y*point2.z - this.point2.y*point1.z;
+	this.yz23 = this.point2.y*this.point3.z - this.point3.y*this.point2.z;
+	this.yz13 = this.point1.y*this.point3.z - this.point3.y*this.point1.z;
+	this.yz12 = this.point1.y*this.point2.z - this.point2.y*this.point1.z;
 	
 	this._rayIntersectCommon = function(){};
 };
