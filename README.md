@@ -6,9 +6,11 @@ LeapJS
 LeapJS is a Javascript library that provides the functionality and object structure of the Leap API to assist developers who are working with the Leap Motion in a browser environment.
 
 **Leap**
-* _string_ **Version**
+* _string_ **APIVersion**
+* _string_ **serverVersion**
 * **Controller**
   * **Controller**( _string_ **connection** )
+  * _Frame_ **frame**()
   * _Frame_ **frame**( _Int_ **index** )
   * _void_ **addListener**( _Listener_ **listener** )
   * _void_ **removeListener**( _Listener_ **listener** )
