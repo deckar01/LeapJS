@@ -4,6 +4,11 @@ Leap.Controller = function(connection){
 	this._listeners = {};
 	this._listenerId = 0;
 	
+	this._bufferSize = 1024;
+	this._bufferBegin = 0;
+	
+	for(var index = 0; index < this._bufferSize; index++) this._frames[index] = Leap.Frame.invalid();
+	
 	if ((typeof(WebSocket) == 'undefined') && (typeof(MozWebSocket) != 'undefined')) WebSocket = MozWebSocket;
 	
 	if (typeof(WebSocket) != 'undefined'){
@@ -12,7 +17,7 @@ Leap.Controller = function(connection){
 		this._socket._controller = this;
 		
 		this._socket.onmessage = function(event){
-			this._controller._onmessage(event);
+			this._controller._versionFrame(event);
 		};
 		
 		this._socket.onopen = function(event){
@@ -38,9 +43,12 @@ Leap.Controller.prototype = {
 	},
 	
 	frame : function(index){
-		if(index == null) return this._frames[this._frames.length-1];
-		if(index < this._frames.length)
-			return this._frames[this._frames.length-index-1];
+		if(index == null || index == 0) return this._frames[this._bufferBegin];
+		if(index > this._bufferSize - 1) return Leap.Frame.invalid();
+		
+		index = this._bufferBegin-index;
+		if(index < 0) index += this._bufferSize;
+		return this._frames[index];
 	},
 	
 	addListener : function(listener){
@@ -66,16 +74,20 @@ Leap.Controller.prototype = {
 	_onmessage : function(event){
 		
 		var eventData = JSON.parse(event.data);
-		if(this._discardVersionFrame(eventData)){
-			var newFrame = new Leap.Frame(eventData);
-			this._frames.push(newFrame);
-			for(index in this._listeners)
-				this._listeners[index].onFrame(this);
-		}
+		var newFrame = new Leap.Frame(eventData);
+		
+		this._bufferBegin++;
+		if(this._bufferBegin == this._bufferSize) this._bufferBegin = 0;
+		
+		delete this._frames[this._bufferBegin];
+		this._frames[this._bufferBegin] = newFrame;
+		
+		for(index in this._listeners)
+			this._listeners[index].onFrame(this);
 	},
 	
-	_discardVersionFrame : function(data){
-		if(data.version){ this._discardVersionFrame = function(){return true;}; return false;}
-		else return true;
+	_versionFrame : function(event){
+		Leap.serverVersion = JSON.parse(event.data).version;
+		this._socket.onmessage = function(event){ this._controller._onmessage(event); };
 	}
 };
