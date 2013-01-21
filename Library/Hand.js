@@ -14,9 +14,9 @@ Leap.Hand = function(handData, parentFrame){
 		this._id = null;
 		this._valid = false;
 		
-		this._r = new Leap.Matrix();
-		this._s = null;
-		this._t = new Leap.Vector();
+		this._rotation = new Leap.Matrix();
+		this._scale = null;
+		this._translation = new Leap.Vector();
 		
 		this._direction = new Leap.Vector();
 		this._palmNormal = new Leap.Vector();
@@ -31,9 +31,9 @@ Leap.Hand = function(handData, parentFrame){
 		this._id = handData.id;
 		this._valid = true;
 		
-		this._r = new Leap.Matrix(handData.r);
-		this._s = handData.s;
-		this._t = new Leap.Vector(handData.t);
+		this._rotation = new Leap.Matrix(handData.r);
+		this._scale = handData.s;
+		this._translation = new Leap.Vector(handData.t);
 		
 		this._direction = new Leap.Vector(handData.direction);
 		this._palmNormal = new Leap.Vector(handData.palmNormal);

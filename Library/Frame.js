@@ -15,18 +15,18 @@ Leap.Frame = function(frameData){
 		this._timestamp = null;
 		this._valid = false;
 		
-		this._r = new Leap.Matrix();
-		this._s = null;
-		this._t = new Leap.Vector();
+		this._rotation = new Leap.Matrix();
+		this._scale = null;
+		this._translation = new Leap.Vector();
 	}
 	else{
 		this._id = frameData.id;
 		this._timestamp = frameData.timestamp;
 		this._valid = true;
 		
-		this._r = new Leap.Matrix(frameData.r);
-		this._s = frameData.s;
-		this._t = new Leap.Vector(frameData.t);
+		this._rotation = new Leap.Matrix(frameData.r);
+		this._scale = frameData.s;
+		this._translation = new Leap.Vector(frameData.t);
 		
 		for(index in frameData.hands){
 		

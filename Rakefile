@@ -18,16 +18,15 @@ task :build do
 	puts "Leap.js length: #{filedata.length} (before uglifier)"
     filedata = Uglifier.new.compile(filedata)
 	puts "Leap.min.js length: #{filedata.length} (after uglifier)"
-	privatevars = Hash.new
-	filedata.scan(/(_[\w\d]+)/) { |n| privatevars[n[0]]=(privatevars[n[0]]?privatevars[n[0]]:0)+n[0].length }
-	privatevars = (privatevars.sort_by { |n,c| c }).reverse
+	varhash = Hash.new
+	filedata.scan(/(_[\w\d]+)/) { |n| varhash[n[0]] = (varhash[n[0]]?varhash[n[0]]:0)+n[0].length }
+	privatevars = (varhash.sort_by { |n,c| c }).reverse
 	alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvw"
 	counter = 0
 	shortname = alphabet[0]
 	privatevars.each do |e|
-	  if shortname.length < e[0].length
-		filedata.gsub! /#{e[0]}/,shortname
-		puts "#{e[0]} => #{shortname}"
+	  if shortname.length <= e[0].length
+		varhash[e[0]] = shortname
 	    counter += 1
 		if counter < alphabet.length
 		  shortname = "#{alphabet[counter]}"
@@ -36,7 +35,15 @@ task :build do
 		  b = alphabet[counter%alphabet.length]
 		  shortname = "#{a}#{b}"
 		end
+	  else
+	    varhash.delete e[0]
+	    puts "#{e[0]} skipped"
       end
+	end
+	safevars = (varhash.sort_by { |n,c| n.length }).reverse
+	safevars.each do |e|
+	  filedata.gsub! /#{e[0]}/,e[1]
+	  puts "#{e[0]} => #{e[1]}"
 	end
 	puts "Leap.min.js length: #{filedata.length} (after private variable replacement)"
 	f << filedata
