@@ -81,6 +81,9 @@ Leap.Hand.prototype = {
 	rotationAngle : function(sinceFrame, axis){
 		// TODO: implement axis parameter
 		if (!this._valid || !sinceFrame._valid) return 0.0;
+		var sinceHand = sinceFrame.hand(this._id);
+		if(!sinceHand._valid) return 0.0;
+		
 		var rot = this.rotationMatrix(sinceFrame);
 		var cs = (rot.xBasis.x + rot.yBasis.y + rot.zBasis.z - 1.0)*0.5
 		var angle = Math.acos(cs);
@@ -89,32 +92,44 @@ Leap.Hand.prototype = {
 	
 	rotationAxis : function(sinceFrame){
 		if (!this._valid || !sinceFrame._valid) return Leap.Vector.zero();
-		var x = this._rotation.zBasis.y - sinceFrame._rotation.yBasis.z;
-		var y = this._rotation.xBasis.z - sinceFrame._rotation.zBasis.x;
-		var z = this._rotation.yBasis.x - sinceFrame._rotation.xBasis.y;
+		var sinceHand = sinceFrame.hand(this._id);
+		if(!sinceHand._valid) return Leap.Vector.zero();
+		
+		var x = this._rotation.zBasis.y - sinceHand._rotation.yBasis.z;
+		var y = this._rotation.xBasis.z - sinceHand._rotation.zBasis.x;
+		var z = this._rotation.yBasis.x - sinceHand._rotation.xBasis.y;
 		var vec = new Leap.Vector([x, y, z]);
 		return vec.normalize();
 	},
 	
 	rotationMatrix : function(sinceFrame){
 		if (!this._valid || !sinceFrame._valid) return Leap.Matrix.identity();
+		var sinceHand = sinceFrame.hand(this._id);
+		if(!sinceHand._valid) return Leap.Matrix.identity();
+		
 		var xBasis = new Leap.Vector([this._rotation.xBasis.x, this._rotation.yBasis.x, this._rotation.zBasis.x]);
 		var yBasis = new Leap.Vector([this._rotation.xBasis.y, this._rotation.yBasis.y, this._rotation.zBasis.y]);
 		var zBasis = new Leap.Vector([this._rotation.xBasis.z, this._rotation.yBasis.z, this._rotation.zBasis.z]);
 		var transpose = new Leap.Matrix([xBasis, yBasis, zBasis]);
-		return sinceFrame._rotation.multiply(transpose);
+		return sinceHand._rotation.multiply(transpose);
 	},
 	
 	scaleFactor : function(sinceFrame){
 		if (!this._valid || !sinceFrame._valid) return 1.0;
-		return Math.exp(this._scale - sinceFrame._scale);
+		var sinceHand = sinceFrame.hand(this._id);
+		if(!sinceHand._valid) return 1.0;
+		
+		return Math.exp(this._scale - sinceHand._scale);
 	},
 	
 	translation : function(sinceFrame){
 		if (!this.valid || !sinceFrame.valid) return Leap.Vector.zero();
-		var x = this._translation.x - sinceFrame._translation.x;
-		var y = this._translation.y - sinceFrame._translation.y;
-		var z = this._translation.z - sinceFrame._translation.z;
+		var sinceHand = sinceFrame.hand(this._id);
+		if(!sinceHand._valid) return Leap.Vector.zero();
+		
+		var x = this._translation.x - sinceHand._translation.x;
+		var y = this._translation.y - sinceHand._translation.y;
+		var z = this._translation.z - sinceHand._translation.z;
 		return new Leap.Vector([x, y, z]);
 	},
 	
