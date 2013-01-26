@@ -115,7 +115,7 @@ LeapJS is a Javascript library that provides the functionality and object struct
   * _int_ **count**()
 * **Screen**
   * **Screen**()
-  * **Screen**( [_Vector_, _Vector_, _Vector_] data )
+  * **Screen**( [ _Vector_, _Vector_, _Vector_ ] data )
   * _float_ **distanceToPoint**( _Vector_ point )
   * { **position** : _Vector_, **distance** : _float_ } **intersect**( _Pointable_ **pointable**, _Bool_ **normalize** )
   * _Vector_ **normal**()
