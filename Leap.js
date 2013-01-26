@@ -827,7 +827,7 @@ Leap.Screen = function(data){
 	
 	if(data){
 	
-		this._plane = new Plane(data[0],data[1],data[2]);
+		this._plane = new Leap.Plane(data[0],data[1],data[2]);
 		this._center = data[0].plus(data[2]).dividedBy(2);
 		this._origin = data[1].plus(data[1].minus(this._center));
 		
@@ -850,18 +850,18 @@ Leap.Screen = function(data){
 Leap.Screen.prototype = {
 	
 	distanceToPoint : function(point){
-		return this._plane.pointIntersect(point).distance;
+		return this._plane.pointDistance(point);
 	},
 	
 	intersect : function(pointable, normalize, clampRatio){
 		// TODO: Implement clampRatio
-		var intersect = this._plane.rayIntersect(pointable.tipPosition(), pointable.direction()).position;
+		var intersect = this._plane.rayIntersect(pointable.tipPosition(), pointable.direction());
 		
-		if(normalize){
-			var direction = intersect.minus(this._origin);
+		if(normalize){ // Normalizes to 2D pixels
+			var direction = intersect.position.minus(this._origin);
 			var x = this._xspan.dot(direction);
 			var y = this._yspan.dot(direction);
-			return new Leap.Vector([x, y, 0]);
+			intersect.position = new Leap.Vector([x, y, 0]);
 		}
 		
 		return intersect;
