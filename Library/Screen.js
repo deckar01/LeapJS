@@ -51,4 +51,4 @@ Leap.Screen.prototype = {
 	}
 };
 
-Leap.invalid = function(){ return new Leap.Screen(); };
+Leap.Screen.invalid = function(){ return new Leap.Screen(); }
