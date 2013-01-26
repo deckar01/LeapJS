@@ -7,6 +7,8 @@ Leap.Controller = function(connection){
 	this._bufferSize = 1024;
 	this._bufferBegin = 0;
 	
+	this._screens = new Leap.ScreenList();
+	
 	for(var index = 0; index < this._bufferSize; index++) this._frames[index] = Leap.Frame.invalid();
 	
 	if ((typeof(WebSocket) == 'undefined') && (typeof(MozWebSocket) != 'undefined')) WebSocket = MozWebSocket;
@@ -68,7 +70,7 @@ Leap.Controller.prototype = {
 	},
 	
 	calibratedScreens : function(){
-		// Requires additional data from WebSocket server
+		return this._screens;
 	},
 	
 	_onmessage : function(event){
