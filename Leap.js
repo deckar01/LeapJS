@@ -878,7 +878,7 @@ Leap.Screen.prototype = {
 	}
 };
 
-Leap.invalid = function(){ return new Leap.Screen(); };
+Leap.Screen.invalid = function(){ return new Leap.Screen(); }
 Leap.ScreenList = function(){};
 
 Leap.ScreenList.prototype = new Array;
