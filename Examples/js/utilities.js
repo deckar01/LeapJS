@@ -104,6 +104,12 @@ function drawHand(hand){
 		var x = 400-(hand.sphereCenter().z + 50);
 		var y = 600-(hand.sphereCenter().y);
 		
+		buffercx1.beginPath()
+		buffercx1.moveTo(x, y);
+		buffercx1.lineTo(x-hand.palmNormal().z*radius, y-hand.palmNormal().y*radius);
+		buffercx1.strokeStyle = 'red';
+		buffercx1.stroke();
+	
 		buffercx1.beginPath();
 		buffercx1.arc(x, y, radius, 0, 2 * Math.PI, false);
 		buffercx1.fillStyle = 'rgba(255,255,255,.3)';
@@ -117,6 +123,12 @@ function drawHand(hand){
 		x = hand.sphereCenter().x + 250;
 		y = hand.sphereCenter().z + 250;
 		
+		buffercx2.beginPath();
+		buffercx2.moveTo(x, y);
+		buffercx2.lineTo(x+hand.palmNormal().x*radius, y+hand.palmNormal().z*radius);
+		buffercx2.strokeStyle = 'red';
+		buffercx2.stroke();
+	
 		buffercx2.beginPath();
 		buffercx2.arc(x, y, radius, 0, 2 * Math.PI, false);
 		buffercx2.fillStyle = 'rgba(255,255,255,.3)';
