@@ -1,4 +1,4 @@
-var Leap = { APIVersion : "0.7.1" };
+var Leap = { APIVersion : "0.7.2" };
 
 Leap.Controller = function(connection){
 	
