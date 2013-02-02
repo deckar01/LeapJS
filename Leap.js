@@ -9,9 +9,16 @@ Leap.Calibrate = function(controller){
 	this._elem = document.createElement("div");
 	this._elem.style.cssText = this._pointCSS + this._point1CSS;
 	this._elem.innerText = "1";
+	this._elem.title = "Place finger here, then click.\nMake sure only one finger is visible."
+	
 	this._elem.onclick = function(){ me._calibrate1(); };
 	
 	document.body.appendChild(this._elem);
+	
+	var me = this;
+	this._listener = new Leap.Listener();
+	this._listener.onFrame = function(controller){ me._fingerCount(controller); };
+	this._controller.addListener(this._listener);
 };
 
 Leap.Calibrate.prototype = {
@@ -51,8 +58,16 @@ Leap.Calibrate.prototype = {
 			document.body.removeChild(this._elem);
 			delete this._elem;
 			
+			this._controller.removeListener(this._listener);
 			this.onComplete(new Leap.Screen(this._points));
 		}
+	},
+	
+	_fingerCount : function(controller){
+		var count = controller.frame().pointables().count();
+		if(count == 0) this._elem.style.backgroundColor = "#c3cccc";
+		else if(count == 1) this._elem.style.backgroundColor = "#BCD63C";
+		else this._elem.style.backgroundColor = "#FF0000";
 	},
 	
 	onComplete : function(screen){}
