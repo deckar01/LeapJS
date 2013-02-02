@@ -922,8 +922,8 @@ Leap.Screen = function(data){
 		
 		var xv = data[2].minus(data[0]);
 		var yv = data[0].minus(data[1]);
-		var xscale = 2*xv.magnitude()/document.width;
-		var yscale = 4*yv.magnitude()/document.height;
+		var xscale = 2*xv.magnitude()/window.screen.width;
+		var yscale = 4*yv.magnitude()/window.screen.height;
 		this._xspan = xv.normalized().dividedBy(xscale);
 		this._yspan = yv.normalized().dividedBy(yscale);
 		
