@@ -5,9 +5,24 @@ LeapJS
 
 LeapJS is a Javascript library that provides the functionality and object structure of the Leap API to assist developers who are working with the Leap Motion in a browser environment.
 
+**Whats new?**
+* **Calibrate**
+  * **Calibrate**( _Controller_ **controller** )
+  * _virtual void_ **onComplete**( _Screen_ **screen** )
+* **Screen**
+  * **Screen**()
+  * _float_ **distanceToPoint**( _Vector_ point )
+  * { **position** : _Vector_, **distance** : _float_ } **intersect**( _Pointable_ **pointable**, _Bool_ **normalize** )
+  * _Vector_ **normal**()
+  * _Bool_ **isValid**()
+  * _static Screen_ **invalid**()
+
 **Leap**
 * _string_ **APIVersion**
 * _string_ **serverVersion**
+* **Calibrate**
+  * **Calibrate**( _Controller_ **controller** )
+  * _virtual void_ **onComplete**( _Screen_ **screen** )
 * **Controller**
   * **Controller**( _string_ **connection** )
   * _Frame_ **frame**()
@@ -115,7 +130,6 @@ LeapJS is a Javascript library that provides the functionality and object struct
   * _int_ **count**()
 * **Screen**
   * **Screen**()
-  * **Screen**( [ _Vector_ **point1**, _Vector_ **point2**, _Vector_ **point3** ] )
   * _float_ **distanceToPoint**( _Vector_ point )
   * { **position** : _Vector_, **distance** : _float_ } **intersect**( _Pointable_ **pointable**, _Bool_ **normalize** )
   * _Vector_ **normal**()
