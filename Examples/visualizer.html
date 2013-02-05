@@ -1,0 +1,70 @@
+<html>
+  <head>
+    <title>Visualizer - Leap</title>
+    <style>
+      canvas { background-color: black; position: fixed; left: 0px; top: 0px; }
+    </style>
+    <script src="./js/three.js"></script>
+    <script src="../Leap.js"></script>
+	<script>
+	var init = function(){
+      var scene = new THREE.Scene();
+      var camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.10, 1000);
+      var renderer = new THREE.WebGLRenderer();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement); 
+      camera.position.z = 500;
+      camera.position.y = 200;
+      camera.lookAt(new THREE.Vector3(0,200,0))
+	  
+	  var controller = new Leap.Controller("ws://localhost:6437/");
+	  
+      var fingers = {};
+      var spheres = {};
+	  
+      Leap.AnimLoop(controller, function(controller) {
+	  
+	    var frame = controller.frame();
+        var fingerIds = {};
+        var handIds = {};
+		
+        for (var index = 0; index < frame.pointables().count(); index++) {
+		
+          var pointable = frame.pointables()[index];
+          var finger = fingers[pointable.id()];
+		  
+		  var pos = pointable.tipPosition();
+		  var dir = pointable.direction();
+		  
+          var origin = new THREE.Vector3(pos.x, pos.y, -pos.z);
+          var direction = new THREE.Vector3(dir.x, dir.y, -dir.z);
+		  
+          if (!finger) {
+            finger = new THREE.ArrowHelper(origin, direction, 40, Math.random() * 0xffffff);
+            fingers[pointable.id()] = finger;
+            scene.add(finger);
+          }
+		  
+          finger.position = origin;
+          finger.setDirection(direction);
+		  
+		  fingerIds[pointable.id()] = true;
+        }
+
+
+        for (fingerId in fingers) {
+          if (!fingerIds[fingerId]) {
+            scene.remove(fingers[fingerId]);
+            delete fingers[fingerId];
+          }
+        }
+
+        renderer.render(scene, camera);
+      });
+	};
+    </script>
+  </head>
+  <body onload="setTimeout(init, 100);">
+    <div id="out"></div>
+  </body>
+</html>
