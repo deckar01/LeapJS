@@ -6,7 +6,7 @@ Leap.Calibrate = function(controller){
 	
 	this._elem = document.createElement("div");
 	this._elem.style.cssText = this._pointCSS + this._point1CSS;
-	this._elem.innerText = "1";
+	this._elem.innerHTML = "1";
 	this._elem.title = "Place finger here, then click.\nMake sure only one finger is visible."
 	
 	this._elem.onclick = function(){ me._calibrate1(); };
@@ -32,7 +32,7 @@ Leap.Calibrate.prototype = {
 			var me = this;
 			this._points[0] = pointables[0].tipPosition();
 			this._elem.style.cssText = this._pointCSS + this._point2CSS;
-			this._elem.innerText = "2";
+			this._elem.innerHTML = "2";
 			this._elem.onclick = function(){ me._calibrate2(); };
 		}
 	},
@@ -43,7 +43,7 @@ Leap.Calibrate.prototype = {
 			var me = this;
 			this._points[1] = pointables[0].tipPosition();
 			this._elem.style.cssText = this._pointCSS + this._point3CSS;
-			this._elem.innerText = "3";
+			this._elem.innerHTML = "3";
 			this._elem.onclick = function(){ me._calibrate3(); };
 		}
 	},
