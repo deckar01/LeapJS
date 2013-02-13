@@ -105,6 +105,8 @@ Leap.Calibrate.prototype = {
 	
 	onComplete : function(screen){}
 }
+if ((typeof(WebSocket) == 'undefined') && (typeof(MozWebSocket) != 'undefined')) WebSocket = MozWebSocket;
+
 Leap.Controller = function(connection){
 	
 	this._frames = [];
@@ -118,31 +120,7 @@ Leap.Controller = function(connection){
 	
 	for(var index = 0; index < this._bufferSize; index++) this._frames[index] = Leap.Frame.invalid();
 	
-	if ((typeof(WebSocket) == 'undefined') && (typeof(MozWebSocket) != 'undefined')) WebSocket = MozWebSocket;
-	
-	if (typeof(WebSocket) != 'undefined'){
-		
-		this._socket = new WebSocket(connection);
-		this._socket._controller = this;
-		
-		this._socket.onmessage = function(event){
-			this._controller._versionFrame(event);
-		};
-		
-		this._socket.onopen = function(event){
-			for(index in this._controller._listeners)
-				this._controller._listeners[index].onConnect(this._controller);
-		};
-		
-		this._socket.onclose = function(event){
-			for(index in this._controller._listeners)
-				this._controller._listeners[index].onDisconnect(this._controller);
-		};
-		
-		this._socket.onerror = function(event){ 
-			this.onclose(event);
-		};
-	}
+	this._connect(connection);
 };
 
 Leap.Controller.prototype = {
@@ -198,6 +176,34 @@ Leap.Controller.prototype = {
 	_versionFrame : function(event){
 		Leap.serverVersion = JSON.parse(event.data).version;
 		this._socket.onmessage = function(event){ this._controller._onmessage(event); };
+	},
+	
+	_connect : function(connection){
+		if (typeof(WebSocket) == 'undefined') return;
+		
+		if(this._socket) delete this._socket;
+		this._socket = new WebSocket(connection);
+		this._socket._controller = this;
+		
+		this._socket.onmessage = function(event){
+			this._controller._versionFrame(event);
+		};
+		
+		this._socket.onopen = function(event){
+			for(index in this._controller._listeners)
+				this._controller._listeners[index].onConnect(this._controller);
+		};
+		
+		this._socket.onclose = function(event){
+			for(index in this._controller._listeners)
+				this._controller._listeners[index].onDisconnect(this._controller);
+			var me = this;
+			setTimeout(function(){ me._controller._connect(me.url); }, 1000);
+		};
+		
+		this._socket.onerror = function(event){ 
+			this.onclose(event);
+		};
 	}
 };
 
