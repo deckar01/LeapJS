@@ -79,7 +79,7 @@ Leap.Frame.prototype = {
 		var rot = this.rotationMatrix(sinceFrame);
 		var cs = (rot.xBasis.x + rot.yBasis.y + rot.zBasis.z - 1.0)*0.5
 		var angle = Math.acos(cs);
-		return angle === NaN ? 0.0 : angle;
+		return isNaN(angle) ? 0.0 : angle;
 	},
 	
 	rotationAxis : function(sinceFrame){
@@ -97,7 +97,7 @@ Leap.Frame.prototype = {
 		var yBasis = new Leap.Vector([this._rotation.xBasis.y, this._rotation.yBasis.y, this._rotation.zBasis.y]);
 		var zBasis = new Leap.Vector([this._rotation.xBasis.z, this._rotation.yBasis.z, this._rotation.zBasis.z]);
 		var transpose = new Leap.Matrix([xBasis, yBasis, zBasis]);
-		return sinceFrame._rotation.multiply(transpose);
+		return sinceFrame._rotation.times(transpose);
 	},
 	
 	scaleFactor : function(sinceFrame){
