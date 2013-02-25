@@ -852,6 +852,14 @@ Leap.Pointable.prototype = {
 		return this._tipVelocity;
 	},
 	
+	isFinger : function(){
+		return this._isFinger;
+	},
+	
+	isTool : function(){
+		return this._isTool;
+	},
+	
 	length : function(){
 		return this._length;
 	},
