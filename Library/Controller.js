@@ -77,17 +77,20 @@ Leap.Controller.prototype = {
 		if(this._socket) delete this._socket;
 		this._socket = new WebSocket(connection);
 		this._socket._controller = this;
+		this._socket.connected = false;
 		
 		this._socket.onmessage = function(event){
 			this._controller._versionFrame(event);
 		};
 		
 		this._socket.onopen = function(event){
+			this.connected = true;
 			for(index in this._controller._listeners)
 				this._controller._listeners[index].onConnect(this._controller);
 		};
 		
 		this._socket.onclose = function(event){
+			this.connected = false;
 			for(index in this._controller._listeners)
 				this._controller._listeners[index].onDisconnect(this._controller);
 			var me = this;
