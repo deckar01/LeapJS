@@ -92,6 +92,7 @@ Leap.Pointable.invalid = function(){
 	return new Leap.Pointable();
 };
 
+/* Finger */
 Leap.Finger = function(fingerData, parentHand){
 	
 	Leap.Pointable(fingerData, parentHand, this);
@@ -106,6 +107,7 @@ Leap.Finger.invalid = function(){
 	return new Leap.Finger();
 };
 
+/* Tool */
 Leap.Tool = function(toolData, parentHand){
 
 	Leap.Pointable(toolData, parentHand, this);
