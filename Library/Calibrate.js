@@ -51,13 +51,14 @@ Leap.Calibrate.prototype = {
 	_calibrate3 : function(){
 		var pointables = this._controller.frame().pointables();
 		if(pointables.count() == 1){
-			var me = this;
 			this._points[2] = pointables[0].tipPosition();
 			document.body.removeChild(this._elem);
 			delete this._elem;
 			
+			var screen = new Leap.Screen(this._points);
+			this._controller._screens.push(screen);
 			this._controller.removeListener(this._listener);
-			this.onComplete(new Leap.Screen(this._points));
+			this.onComplete(screen);
 		}
 	},
 	
