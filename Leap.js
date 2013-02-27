@@ -470,18 +470,18 @@ Leap.Gesture.prototype = {
 };
 
 Leap.Gesture.State = {
-	INVALID : 0,
-	START : 1,
-	STOP : 2,
-	UPDATE : 3
+	INVALID : "INVALID",
+	START : "START",
+	STOP : "STOP",
+	UPDATE : "UPDATE"
 };
 
 Leap.Gesture.Type = {
-	INVALID : 0,
-	CIRCE : 1,
-	KEYTAP : 2,
-	SCREENTAP : 3,
-	SWIPE : 4
+	INVALID : "INVALID",
+	CIRCE : "CIRCE",
+	KEYTAP : "KEYTAP",
+	SCREENTAP : "SCREENTAP",
+	SWIPE : "SWIPE"
 };
 
 Leap.Gesture.invalid = function(){
