@@ -4,11 +4,14 @@ Leap.Frame = function(frameData){
 	this._tools = new Leap.ToolList();
 	this._pointables = new Leap.PointableList();
 	this._hands = new Leap.HandList();
+	this._gestures = new Leap.GestureList();
+	
 	
 	this._fingerTable = {};
 	this._toolTable = {};
 	this._pointableTable = {};
 	this._handTable = {};
+	this._gestureTable = {};
 
 	if(frameData == null){
 		this._id = null;
@@ -34,6 +37,23 @@ Leap.Frame = function(frameData){
 			this._handTable[newHand._id] = newHand;
 			this._hands.push(newHand);
 		}
+		
+		/*for(index in frameData.gestures){
+			
+			var newGesture;
+			switch(frameData.gestures[index].type){
+				case Leap.Gesture.Type.CIRCLE :
+					newGesture = new Leap.CircleGesture(frameData.gestures[index],this); break;
+				case Leap.Gesture.Type.KEYTAP :
+					newGesture = new Leap.KeyTapGesture(frameData.gestures[index],this); break;
+				case Leap.Gesture.Type.SCREENTAP :
+					newGesture = new Leap.ScreenTapGesture(frameData.gestures[index],this); break;
+				case Leap.Gesture.Type.SWIPE :
+					newGesture = new Leap.SwipeGesture(frameData.gestures[index],this); break;
+			}
+			this._gestureTable[newGesture._id] = newGesture;
+			this._gestures.push(newGesture);
+		}*/
 		
 		for(index in frameData.pointables){
 			var hand = this._handTable[frameData.pointables[index].handId];
@@ -120,6 +140,15 @@ Leap.Frame.prototype = {
 	
 	fingers : function(){
 		return this._fingers;
+	},
+	
+	gesture : function(id){
+		if(this._gestureTable[id]==null) return Leap.Gesture.invalid();
+		return this._gesture[id];
+	},
+	
+	gestures : function(){
+		return this._gestures;
 	},
 	
 	hand : function(id){

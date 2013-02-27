@@ -53,14 +53,14 @@ Leap.Gesture.prototype = {
 	isValid : function(){ return this._valid; }
 };
 
-Gesture.State = {
+Leap.Gesture.State = {
 	INVALID : 0,
 	START : 1,
 	STOP : 2,
 	UPDATE : 3
 };
 
-Gesture.Type = {
+Leap.Gesture.Type = {
 	INVALID : 0,
 	CIRCE : 1,
 	KEYTAP : 2,
