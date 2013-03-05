@@ -11,6 +11,9 @@ Leap.Controller = function(connection){
 	
 	this._screens = new Leap.ScreenList();
 	
+	this._gesturesActive = false;
+	this._gesturesAllowed = {};
+	
 	for(var index = 0; index < this._bufferSize; index++) this._frames[index] = Leap.Frame.invalid();
 	
 	this._connect(connection);
@@ -51,10 +54,29 @@ Leap.Controller.prototype = {
 		return this._screens;
 	},
 	
+	enableGesture : function(type, enable){
+	
+		if(enable) this._gesturesAllowed[type] = Leap.Gesture.Type[type];
+		else delete this._gesturesAllowed[type];
+		
+		if(!this._gesturesActive && Object.keys(this._gesturesAllowed).length > 0){
+			this._gesturesActive = true;
+			this._socket.send(JSON.stringify({enableGestures: true}));
+		}
+		else if(this._gesturesActive && Object.keys(this._gesturesAllowed).length == 0){
+			this._gesturesActive = true;
+			this._socket.send(JSON.stringify({enableGestures: false}));
+		}
+	},
+	
+	isGestureEnabled : function(type){
+		return this._gesturesAllowed[type]?true:false;
+	},
+	
 	_onmessage : function(event){
 		
 		var eventData = JSON.parse(event.data);
-		var newFrame = new Leap.Frame(eventData);
+		var newFrame = new Leap.Frame(eventData, this);
 		
 		this._bufferBegin++;
 		if(this._bufferBegin == this._bufferSize) this._bufferBegin = 0;

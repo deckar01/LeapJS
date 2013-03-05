@@ -7,6 +7,9 @@ Leap.Gesture = function(gestureData, frame, obj){
 	
 	if(gestureData==null){
 		obj._id = null;
+		obj._frame = Leap.Frame.Invalid();
+		obj._state = Leap.Gesture.State.invalid;
+		obj._type = Leap.Gesture.Type.invalid;
 		obj._valid = false;
 	}
 	else{
@@ -16,12 +19,12 @@ Leap.Gesture = function(gestureData, frame, obj){
 		obj._type = gestureData.type;
 		obj._valid = true;
 		
-		for(index in frameData.hands){
+		for(index in gestureData.hands){
 			var hand = frame.hand(frameData.hands[index]);
 			obj._hands.push(hand);
 		}
 		
-		for(index in frameData.pointables){
+		for(index in gestureData.pointables){
 			var pointable = frame.pointable(frameData.pointables[index]);
 			obj._hands.push(pointable);
 		}
@@ -51,21 +54,6 @@ Leap.Gesture.prototype = {
 	},
 	
 	isValid : function(){ return this._valid; }
-};
-
-Leap.Gesture.State = {
-	INVALID : "INVALID",
-	START : "START",
-	STOP : "STOP",
-	UPDATE : "UPDATE"
-};
-
-Leap.Gesture.Type = {
-	INVALID : "INVALID",
-	CIRCE : "CIRCE",
-	KEYTAP : "KEYTAP",
-	SCREENTAP : "SCREENTAP",
-	SWIPE : "SWIPE"
 };
 
 Leap.Gesture.invalid = function(){
@@ -133,3 +121,18 @@ Leap.ScreenTapGesture.prototype.pointable = function(){ return this._pointable; 
 Leap.ScreenTapGesture.prototype.position = function(){ return this._position; };
 Leap.ScreenTapGesture.prototype.speed = function(){ return this._speed; };
 Leap.ScreenTapGesture.prototype.startPosition = function(){ return this._startPosition; };
+
+Leap.Gesture.State = {
+	"invalid" : "invalid",
+	"start" : "start",
+	"stop" : "stop",
+	"update" : "update"
+};
+
+Leap.Gesture.Type = {
+	"invalid" : Leap.Gesture.invalid,
+	"circle" : Leap.CircleGesture,
+	"keytap" : Leap.KeyTapGesture,
+	"screentap" : Leap.ScreenTapGesture,
+	"swipe" : Leap.SwipeGesture
+};

@@ -1,4 +1,4 @@
-var Leap = { APIVersion : "0.7.4" };
+var Leap = { APIVersion : "0.7.5" };
 
 window.requestAnimFrame = (function(){
     return  window.requestAnimationFrame       ||
@@ -120,6 +120,9 @@ Leap.Controller = function(connection){
 	
 	this._screens = new Leap.ScreenList();
 	
+	this._gesturesActive = false;
+	this._gesturesAllowed = {};
+	
 	for(var index = 0; index < this._bufferSize; index++) this._frames[index] = Leap.Frame.invalid();
 	
 	this._connect(connection);
@@ -160,10 +163,29 @@ Leap.Controller.prototype = {
 		return this._screens;
 	},
 	
+	enableGesture : function(type, enable){
+	
+		if(enable) this._gesturesAllowed[type] = Leap.Gesture.Type[type];
+		else delete this._gesturesAllowed[type];
+		
+		if(!this._gesturesActive && Object.keys(this._gesturesAllowed).length > 0){
+			this._gesturesActive = true;
+			this._socket.send(JSON.stringify({enableGestures: true}));
+		}
+		else if(this._gesturesActive && Object.keys(this._gesturesAllowed).length == 0){
+			this._gesturesActive = true;
+			this._socket.send(JSON.stringify({enableGestures: false}));
+		}
+	},
+	
+	isGestureEnabled : function(type){
+		return this._gesturesAllowed[type]?true:false;
+	},
+	
 	_onmessage : function(event){
 		
 		var eventData = JSON.parse(event.data);
-		var newFrame = new Leap.Frame(eventData);
+		var newFrame = new Leap.Frame(eventData, this);
 		
 		this._bufferBegin++;
 		if(this._bufferBegin == this._bufferSize) this._bufferBegin = 0;
@@ -212,14 +234,15 @@ Leap.Controller.prototype = {
 	}
 };
 
-Leap.Frame = function(frameData){
-
+Leap.Frame = function(frameData, controller){
+	
+	this._controller = controller;
+	
 	this._fingers = new Leap.FingerList();
 	this._tools = new Leap.ToolList();
 	this._pointables = new Leap.PointableList();
 	this._hands = new Leap.HandList();
 	this._gestures = new Leap.GestureList();
-	
 	
 	this._fingerTable = {};
 	this._toolTable = {};
@@ -252,22 +275,15 @@ Leap.Frame = function(frameData){
 			this._hands.push(newHand);
 		}
 		
-		/*for(index in frameData.gestures){
+		for(index in frameData.gestures){
 			
-			var newGesture;
-			switch(frameData.gestures[index].type){
-				case Leap.Gesture.Type.CIRCLE :
-					newGesture = new Leap.CircleGesture(frameData.gestures[index],this); break;
-				case Leap.Gesture.Type.KEYTAP :
-					newGesture = new Leap.KeyTapGesture(frameData.gestures[index],this); break;
-				case Leap.Gesture.Type.SCREENTAP :
-					newGesture = new Leap.ScreenTapGesture(frameData.gestures[index],this); break;
-				case Leap.Gesture.Type.SWIPE :
-					newGesture = new Leap.SwipeGesture(frameData.gestures[index],this); break;
+			var gestureType = this._controller._gesturesAllowed[frameData.gestures[index].type];
+			if(gestureType){
+				var newGesture = new gestureType(frameData.gestures[index],this);
+				this._gestureTable[newGesture._id] = newGesture;
+				this._gestures.push(newGesture);
 			}
-			this._gestureTable[newGesture._id] = newGesture;
-			this._gestures.push(newGesture);
-		}*/
+		}
 		
 		for(index in frameData.pointables){
 			var hand = this._handTable[frameData.pointables[index].handId];
@@ -423,6 +439,9 @@ Leap.Gesture = function(gestureData, frame, obj){
 	
 	if(gestureData==null){
 		obj._id = null;
+		obj._frame = Leap.Frame.Invalid();
+		obj._state = Leap.Gesture.State.invalid;
+		obj._type = Leap.Gesture.Type.invalid;
 		obj._valid = false;
 	}
 	else{
@@ -432,12 +451,12 @@ Leap.Gesture = function(gestureData, frame, obj){
 		obj._type = gestureData.type;
 		obj._valid = true;
 		
-		for(index in frameData.hands){
+		for(index in gestureData.hands){
 			var hand = frame.hand(frameData.hands[index]);
 			obj._hands.push(hand);
 		}
 		
-		for(index in frameData.pointables){
+		for(index in gestureData.pointables){
 			var pointable = frame.pointable(frameData.pointables[index]);
 			obj._hands.push(pointable);
 		}
@@ -467,21 +486,6 @@ Leap.Gesture.prototype = {
 	},
 	
 	isValid : function(){ return this._valid; }
-};
-
-Leap.Gesture.State = {
-	INVALID : "INVALID",
-	START : "START",
-	STOP : "STOP",
-	UPDATE : "UPDATE"
-};
-
-Leap.Gesture.Type = {
-	INVALID : "INVALID",
-	CIRCE : "CIRCE",
-	KEYTAP : "KEYTAP",
-	SCREENTAP : "SCREENTAP",
-	SWIPE : "SWIPE"
 };
 
 Leap.Gesture.invalid = function(){
@@ -549,6 +553,21 @@ Leap.ScreenTapGesture.prototype.pointable = function(){ return this._pointable; 
 Leap.ScreenTapGesture.prototype.position = function(){ return this._position; };
 Leap.ScreenTapGesture.prototype.speed = function(){ return this._speed; };
 Leap.ScreenTapGesture.prototype.startPosition = function(){ return this._startPosition; };
+
+Leap.Gesture.State = {
+	"invalid" : "invalid",
+	"start" : "start",
+	"stop" : "stop",
+	"update" : "update"
+};
+
+Leap.Gesture.Type = {
+	"invalid" : Leap.Gesture.invalid,
+	"circle" : Leap.CircleGesture,
+	"keytap" : Leap.KeyTapGesture,
+	"screentap" : Leap.ScreenTapGesture,
+	"swipe" : Leap.SwipeGesture
+};
 
 Leap.GestureList = function(){};
 
