@@ -5,7 +5,7 @@ LeapJS
 
 LeapJS is a Javascript library that provides the functionality and object structure of the Leap API to assist developers who are working with the Leap Motion in a browser environment.
 
-**Whats new? Gestures!**
+## Whats new? Gestures!
 * **Gesture.Type**
   * "circle"
   * "keytap"
@@ -21,7 +21,7 @@ LeapJS is a Javascript library that provides the functionality and object struct
 * **Frame**
   * _GestureList_ **gestures**()
 
-**Whats new? Calibration!**
+## Whats new? Calibration!
 * **Calibrate**
   * **Calibrate**( _Controller_ **controller** )
   * _virtual void_ **onComplete**( _Screen_ **screen** )
@@ -33,6 +33,7 @@ LeapJS is a Javascript library that provides the functionality and object struct
   * _Bool_ **isValid**()
   * _static Screen_ **invalid**()
 
+## API
 **Leap**
 * _string_ **APIVersion**
 * _string_ **serverVersion**
