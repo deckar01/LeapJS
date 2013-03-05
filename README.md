@@ -5,7 +5,23 @@ LeapJS
 
 LeapJS is a Javascript library that provides the functionality and object structure of the Leap API to assist developers who are working with the Leap Motion in a browser environment.
 
-**Whats new?**
+**Whats new? Gestures!**
+* **Gesture.Type**
+  * "circle"
+  * "keytap"
+  * "screentap"
+  * "swipe"
+* **CircleGesture** : _Gesture_
+* **KeyTapGesture** : _Gesture_
+* **ScreenTapGesture** : _Gesture_
+* **SwipeGesture** : _Gesture_
+* **Controller**
+  * _void_ **enableGesture**( _Gesture.Type_ **type**, _Bool_ **enable** )
+  * _Bool_ **isGestureEnabled**( _Gesture.Type_ **type** )
+* **Frame**
+  * _GestureList_ **gestures**()
+
+**Whats new? Calibration!**
 * **Calibrate**
   * **Calibrate**( _Controller_ **controller** )
   * _virtual void_ **onComplete**( _Screen_ **screen** )
@@ -29,6 +45,8 @@ LeapJS is a Javascript library that provides the functionality and object struct
   * _Frame_ **frame**( _Int_ **index** )
   * _void_ **addListener**( _Listener_ **listener** )
   * _void_ **removeListener**( _Listener_ **listener** )
+  * _void_ **enableGesture**( _Gesture.Type_ **type**, _Bool_ **enable** )
+  * _Bool_ **isGestureEnabled**( _Gesture.Type_ **type** )
 * **Listener**
   * **Listener**()
   * _void_ **onConnect**( _Controller_ **controller** )
@@ -48,6 +66,7 @@ LeapJS is a Javascript library that provides the functionality and object struct
   * _Hand_ **hand**( _string_ **id** )
   * _Pointable_ **pointable**( _string_ **id** )
   * _Tool_ **tool**( _string_ **id** )
+  * _GestureList_ **gestures**()
   * _float_ **rotationAngle**( _Frame_ **sinceFrame** )
   * _Vector_ **rotationAxis**( _Frame_ **sinceFrame** )
   * _Matrix_ **rotationMatrix**( _Frame_ **sinceFrame** )
@@ -57,6 +76,11 @@ LeapJS is a Javascript library that provides the functionality and object struct
   * _Bool_ **compare**( _Frame_ **other** )
   * _Bool_ **isValid**()
   * _static Frame_ **invalid**()
+* **Gesture**
+* **CircleGesture** : _Gesture_
+* **KeyTapGesture** : _Gesture_
+* **ScreenTapGesture** : _Gesture_
+* **SwipeGesture** : _Gesture_
 * **Hand**
   * **Hand**()
   * _Frame_ **frame**()
