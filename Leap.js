@@ -451,14 +451,14 @@ Leap.Gesture = function(gestureData, frame, obj){
 		obj._type = gestureData.type;
 		obj._valid = true;
 		
-		for(index in gestureData.hands){
-			var hand = frame.hand(frameData.hands[index]);
+		for(index in gestureData.handIds){
+			var hand = frame.hand(gestureData.handIds[index]);
 			obj._hands.push(hand);
 		}
 		
-		for(index in gestureData.pointables){
-			var pointable = frame.pointable(frameData.pointables[index]);
-			obj._hands.push(pointable);
+		for(index in gestureData.pointableIds){
+			var pointable = frame.pointable(gestureData.pointableIds[index]);
+			obj._pointables.push(pointable);
 		}
 	}
 };
@@ -498,7 +498,7 @@ Leap.CircleGesture = function(gestureData, frame){
 	Leap.Gesture(gestureData, frame, this);
 	
 	this._normal = new Leap.Vector(gestureData.normal);
-	this._pointable = frame.pointable(gestureData.pointable);
+	this._pointable = this._pointables[0];
 	this._progress = gestureData.progress;
 	this._radius = gestureData.radius;
 };
@@ -513,7 +513,7 @@ Leap.KeyTapGesture = function(gestureData, frame){
 	
 	Leap.Gesture(gestureData, frame, this);
 	
-	this._pointable = frame.pointable(gestureData.pointable);
+	this._pointable = this._pointables[0];
 	this._position = new Leap.Vector(gestureData.position);
 	this._progress = gestureData.progress;
 };
@@ -527,7 +527,7 @@ Leap.ScreenTapGesture = function(gestureData, frame){
 	
 	Leap.Gesture(gestureData, frame, this);
 
-	this._pointable = frame.pointable(gestureData.pointable);
+	this._pointable = this._pointables[0];
 	this._position = new Leap.Vector(gestureData.position);
 	this._progress = gestureData.progress;
 };
@@ -542,7 +542,7 @@ Leap.SwipeGesture = function(gestureData, frame){
 	Leap.Gesture(gestureData, frame, this);
 	
 	this._direction = new Leap.Vector(gestureData.direction);
-	this._pointable = frame.pointable(gestureData.pointable);
+	this._pointable = this._pointables[0];
 	this._position = new Leap.Vector(gestureData.position);
 	this._speed = gestureData.speed;
 	this._startPosition = new Leap.Vector(gestureData.startPosition);
