@@ -39,16 +39,6 @@ Leap.Frame = function(frameData, controller){
 			this._hands.push(newHand);
 		}
 		
-		for(index in frameData.gestures){
-			
-			var gestureType = this._controller._gesturesAllowed[frameData.gestures[index].type];
-			if(gestureType){
-				var newGesture = new gestureType(frameData.gestures[index],this);
-				this._gestureTable[newGesture._id] = newGesture;
-				this._gestures.push(newGesture);
-			}
-		}
-		
 		for(index in frameData.pointables){
 			var hand = this._handTable[frameData.pointables[index].handId];
 			if(frameData.pointables[index].tool){
@@ -72,6 +62,16 @@ Leap.Frame = function(frameData, controller){
 					hand._pointables.push(pointable);
 					hand._fingers.push(pointable);
 				}
+			}
+		}
+		
+		for(index in frameData.gestures){
+			
+			var gestureType = this._controller._gesturesAllowed[frameData.gestures[index].type];
+			if(gestureType){
+				var newGesture = new gestureType(frameData.gestures[index],this);
+				this._gestureTable[newGesture._id] = newGesture;
+				this._gestures.push(newGesture);
 			}
 		}
 	}
