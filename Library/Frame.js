@@ -141,8 +141,17 @@ Leap.Frame.prototype = {
 		return this._gesture[id];
 	},
 	
-	gestures : function(){
-		return this._gestures;
+	gestures : function(sinceFrame){
+		if(sinceFrame == null) return this._gestures;
+		
+		var gestures = new Leap.GestureList();
+		
+		for(var id = sinceFrame.id(); id <= this._id; id++){
+			var frame = this._controller._frameTable[id];
+			if(frame != null) gestures.push(frame._gestures);
+		}
+		
+		return gestures;
 	},
 	
 	hand : function(id){

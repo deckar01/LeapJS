@@ -3,6 +3,8 @@ if ((typeof(WebSocket) == 'undefined') && (typeof(MozWebSocket) != 'undefined'))
 Leap.Controller = function(connection){
 	
 	this._frames = [];
+	this._frameTable = {};
+	
 	this._listeners = {};
 	this._listenerId = 0;
 	
@@ -81,7 +83,9 @@ Leap.Controller.prototype = {
 		this._bufferBegin++;
 		if(this._bufferBegin == this._bufferSize) this._bufferBegin = 0;
 		
+		delete this._frameTable[this._frames[this._bufferBegin]._id];
 		delete this._frames[this._bufferBegin];
+		this._frameTable[newFrame._id] = newFrame;
 		this._frames[this._bufferBegin] = newFrame;
 		
 		for(index in this._listeners)
