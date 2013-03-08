@@ -16,10 +16,11 @@ LeapJS is a Javascript library that provides the functionality and object struct
 * **ScreenTapGesture** : _Gesture_
 * **SwipeGesture** : _Gesture_
 * **Controller**
-  * _void_ **enableGesture**( _Gesture.Type_ **type**, _Bool_ **enable** )
-  * _Bool_ **isGestureEnabled**( _Gesture.Type_ **type** )
+  * _void_ **enableGesture**( _string_ **type**, _Bool_ **enable** )
+  * _Bool_ **isGestureEnabled**( _string_ **type** )
 * **Frame**
   * _GestureList_ **gestures**()
+  * _GestureList_ **gestures**( _Frame_ **sinceFrame** )
 
 ## Whats new? Calibration!
 * **Calibrate**
@@ -46,8 +47,8 @@ LeapJS is a Javascript library that provides the functionality and object struct
   * _Frame_ **frame**( _Int_ **index** )
   * _void_ **addListener**( _Listener_ **listener** )
   * _void_ **removeListener**( _Listener_ **listener** )
-  * _void_ **enableGesture**( _Gesture.Type_ **type**, _Bool_ **enable** )
-  * _Bool_ **isGestureEnabled**( _Gesture.Type_ **type** )
+  * _void_ **enableGesture**( _string_ **type**, _Bool_ **enable** )
+  * _Bool_ **isGestureEnabled**( _string_ **type** )
 * **Listener**
   * **Listener**()
   * _void_ **onConnect**( _Controller_ **controller** )
@@ -68,6 +69,7 @@ LeapJS is a Javascript library that provides the functionality and object struct
   * _Pointable_ **pointable**( _string_ **id** )
   * _Tool_ **tool**( _string_ **id** )
   * _GestureList_ **gestures**()
+  * _GestureList_ **gestures**( _Frame_ **sinceFrame** )
   * _float_ **rotationAngle**( _Frame_ **sinceFrame** )
   * _Vector_ **rotationAxis**( _Frame_ **sinceFrame** )
   * _Matrix_ **rotationMatrix**( _Frame_ **sinceFrame** )
