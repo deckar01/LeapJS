@@ -139,6 +139,33 @@ function drawHand(hand){
 	}
 }
 
+function drawGesture(gesture){
+	var radius = 5;
+	var x = 400-(gesture.pointable().tipPosition().z + 50);
+	var y = 600-(gesture.pointable().tipPosition().y);
+	
+	buffercx1.beginPath();
+	buffercx1.arc(x, y, radius, 0, 2 * Math.PI, false);
+	buffercx1.fillStyle = 'rgba(255,0,0,.8)';
+	buffercx1.fill();
+	buffercx1.lineWidth = 1;
+	buffercx1.strokeStyle = 'black';
+	buffercx1.stroke();
+	
+	
+	radius = 5;
+	x = gesture.pointable().tipPosition().x + 250;
+	y = gesture.pointable().tipPosition().z + 250;
+	
+	buffercx2.beginPath();
+	buffercx2.arc(x, y, radius, 0, 2 * Math.PI, false);
+	buffercx2.fillStyle = 'rgba(255,0,0,.8)';
+	buffercx2.fill();
+	buffercx2.lineWidth = 1;
+	buffercx2.strokeStyle = 'black';
+	buffercx2.stroke();
+}
+
 function drawFrame(frame){
 
 	for(id = 0; id < frame.hands().count(); id++){
@@ -152,8 +179,13 @@ function drawFrame(frame){
 	}
 	
 	for(hid = 0; hid < frame.fingers().count(); hid++){
-		var finger =frame.fingers()[hid];
+		var finger = frame.fingers()[hid];
 		drawFinger(finger);
+	}
+	
+	for(gid = 0; gid < frame.gestures().count(); gid++){
+		var gesture = frame.gestures()[gid];
+		drawGesture(gesture);
 	}
 }
 

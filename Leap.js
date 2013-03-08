@@ -566,11 +566,11 @@ Leap.SwipeGesture = function(gestureData, frame){
 	this._startPosition = new Leap.Vector(gestureData.startPosition);
 };
 
-Leap.ScreenTapGesture.prototype.direction = function(){ return this._direction; };
-Leap.ScreenTapGesture.prototype.pointable = function(){ return this._pointable; };
-Leap.ScreenTapGesture.prototype.position = function(){ return this._position; };
-Leap.ScreenTapGesture.prototype.speed = function(){ return this._speed; };
-Leap.ScreenTapGesture.prototype.startPosition = function(){ return this._startPosition; };
+Leap.SwipeGesture.prototype.direction = function(){ return this._direction; };
+Leap.SwipeGesture.prototype.pointable = function(){ return this._pointable; };
+Leap.SwipeGesture.prototype.position = function(){ return this._position; };
+Leap.SwipeGesture.prototype.speed = function(){ return this._speed; };
+Leap.SwipeGesture.prototype.startPosition = function(){ return this._startPosition; };
 
 Leap.Gesture.State = {
 	"invalid" : "invalid",

@@ -17,7 +17,7 @@
       camera.position.y = 200;
       camera.lookAt(new THREE.Vector3(0,200,0))
 	  
-	  var controller = new Leap.Controller("ws://localhost:6437/");
+	  window.controller = new Leap.Controller("ws://localhost:6437/");
 	  
       var fingers = {};
       var spheres = {};
