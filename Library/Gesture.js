@@ -132,7 +132,7 @@ Leap.Gesture.State = {
 Leap.Gesture.Type = {
 	"invalid" : Leap.Gesture.invalid,
 	"circle" : Leap.CircleGesture,
-	"keytap" : Leap.KeyTapGesture,
-	"screentap" : Leap.ScreenTapGesture,
+	"keyTap" : Leap.KeyTapGesture,
+	"screenTap" : Leap.ScreenTapGesture,
 	"swipe" : Leap.SwipeGesture
 };

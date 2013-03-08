@@ -167,16 +167,21 @@ Leap.Controller.prototype = {
 	
 	enableGesture : function(type, enable){
 	
-		if(enable) this._gesturesAllowed[type] = Leap.Gesture.Type[type];
-		else delete this._gesturesAllowed[type];
-		
-		if(!this._gesturesActive && Object.keys(this._gesturesAllowed).length > 0){
-			this._gesturesActive = true;
-			this._socket.send(JSON.stringify({enableGestures: true}));
+		if(enable){
+			this._gesturesAllowed[type] = Leap.Gesture.Type[type];
+			
+			if(!this._gesturesActive){
+				this._gesturesActive = true;
+				this._socket.send(JSON.stringify({enableGestures: true}));
+			}
 		}
-		else if(this._gesturesActive && Object.keys(this._gesturesAllowed).length == 0){
-			this._gesturesActive = true;
-			this._socket.send(JSON.stringify({enableGestures: false}));
+		else{
+			delete this._gesturesAllowed[type];
+			
+			if(this._gesturesActive && Object.keys(this._gesturesAllowed).length == 0){
+				this._gesturesActive = false;
+				this._socket.send(JSON.stringify({enableGestures: false}));
+			}
 		}
 	},
 	
@@ -577,8 +582,8 @@ Leap.Gesture.State = {
 Leap.Gesture.Type = {
 	"invalid" : Leap.Gesture.invalid,
 	"circle" : Leap.CircleGesture,
-	"keytap" : Leap.KeyTapGesture,
-	"screentap" : Leap.ScreenTapGesture,
+	"keyTap" : Leap.KeyTapGesture,
+	"screenTap" : Leap.ScreenTapGesture,
 	"swipe" : Leap.SwipeGesture
 };
 
