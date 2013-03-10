@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+	<body>
+		<script src="../Leap.js"></script>
+		<script>
+// Create a controller to connect to the Leap Motion
+myController = new Leap.Controller("ws://localhost:6437/");
+
+// Create a listener
+myListener = new Leap.Listener();
+
+// Listener.onFrame is called each time a frame is received
+myListener.onFrame = function(controller){
+
+    var frame = controller.frame();
+    var hands = frame.hands();
+    var pointables = frame.pointables();
+    
+    var gestures = frame.gestures();
+    
+    // Awesome code goes here
+}
+
+// Add the listener to the controller
+myController.addListener(myListener);
+
+// Enable the screenTap gesture
+myController.enableGesture("screenTap", true);
+
+// Listener.onConnect is called when the connection is open
+myListener.onConnect = function(controller){
+	
+    // Calibrate the screen
+    calibrate = new Leap.Calibrate(myController);
+    calibrate.onComplete = function(screen){
+        // Save the screen
+        // Or access it later with myController.calibratedScreens()[0]
+    }
+}
+</script>
+	</body>
+</html>

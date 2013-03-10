@@ -172,7 +172,7 @@ Leap.Controller.prototype = {
 			
 			if(!this._gesturesActive){
 				this._gesturesActive = true;
-				this._socket.send(JSON.stringify({enableGestures: true}));
+				if(this.isConnected()) this._socket.send('{"enableGestures": true}');
 			}
 		}
 		else{
@@ -180,7 +180,7 @@ Leap.Controller.prototype = {
 			
 			if(this._gesturesActive && Object.keys(this._gesturesAllowed).length == 0){
 				this._gesturesActive = false;
-				this._socket.send(JSON.stringify({enableGestures: false}));
+				if(this.isConnected()) this._socket.send('{"enableGestures": false}');
 			}
 		}
 	},
@@ -225,6 +225,7 @@ Leap.Controller.prototype = {
 		
 		this._socket.onopen = function(event){
 			this.connected = true;
+			if(this._controller._gesturesActive) this.send('{"enableGestures": true}');
 			for(index in this._controller._listeners)
 				this._controller._listeners[index].onConnect(this._controller);
 		};
