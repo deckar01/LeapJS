@@ -29,17 +29,17 @@ myListener.onFrame = function(controller){
 // Add the listener to the controller
 myController.addListener(myListener);
 
+// Enable the screenTap gesture
+myController.enableGesture("screenTap", true);
+
 // Listener.onConnect is called when the connection is open
 myListener.onConnect = function(controller){
-
-    // Enable the screenTap gesture
-    myController.enableGesture("screenTap", true);
  
     // Calibrate the screen
     calibrate = new Leap.Calibrate(controller);
     calibrate.onComplete = function(screen){
         // Save the screen
-        // Or access it later with Controller.calibratedScreens()[0]
+        // Or access it later with myController.calibratedScreens()[0]
     }
 }
 ```
