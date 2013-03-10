@@ -5,6 +5,18 @@ LeapJS
 
 LeapJS is a Javascript library that provides the functionality and object structure of the Leap API to assist developers who are working with the Leap Motion in a browser environment.
 
+## Including
+
+Include Leap.js for debugging and access to "private" variables:
+```html
+<script src="Leap.js"></script>
+```
+
+Include Leap.min.js for deployed applications to reduce load times:
+```html
+<script src="Leap.min.js"></script>
+```
+
 ## Tutorial
 
 ```javascript
@@ -59,6 +71,7 @@ myListener.onConnect = function(controller){
   * _Bool_ **isGestureEnabled**( _string_ **type** )
 * **Frame**
   * _GestureList_ **gestures**()
+  * _GestureList_ **gestures**( _Frame_ **sinceFrame** )
 
 ## Whats new? Calibration!
 * **Calibrate**
