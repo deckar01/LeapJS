@@ -7,7 +7,7 @@ Leap.Gesture = function(gestureData, frame, obj){
 	
 	if(gestureData==null){
 		obj._id = null;
-		obj._frame = Leap.Frame.Invalid();
+		obj._frame = Leap.Frame.invalid();
 		obj._state = Leap.Gesture.State.invalid;
 		obj._type = Leap.Gesture.Type.invalid;
 		obj._valid = false;
@@ -71,6 +71,7 @@ Leap.CircleGesture = function(gestureData, frame){
 	this._radius = gestureData.radius;
 };
 
+Leap.CircleGesture.prototype = Leap.Gesture.prototype;
 Leap.CircleGesture.prototype.normal = function(){ return this._normal; };
 Leap.CircleGesture.prototype.pointable = function(){ return this._pointable; };
 Leap.CircleGesture.prototype.progress = function(){ return this._progress; };
@@ -86,6 +87,7 @@ Leap.KeyTapGesture = function(gestureData, frame){
 	this._progress = gestureData.progress;
 };
 
+Leap.KeyTapGesture.prototype = Leap.Gesture.prototype;
 Leap.KeyTapGesture.prototype.pointable = function(){ return this._pointable; };
 Leap.KeyTapGesture.prototype.position = function(){ return this._position; };
 Leap.KeyTapGesture.prototype.progress = function(){ return this._progress; };
@@ -100,6 +102,7 @@ Leap.ScreenTapGesture = function(gestureData, frame){
 	this._progress = gestureData.progress;
 };
 
+Leap.ScreenTapGesture.prototype = Leap.Gesture.prototype;
 Leap.ScreenTapGesture.prototype.pointable = function(){ return this._pointable; };
 Leap.ScreenTapGesture.prototype.position = function(){ return this._position; };
 Leap.ScreenTapGesture.prototype.progress = function(){ return this._progress; };
@@ -116,6 +119,7 @@ Leap.SwipeGesture = function(gestureData, frame){
 	this._startPosition = new Leap.Vector(gestureData.startPosition);
 };
 
+Leap.SwipeGesture.prototype = Leap.Gesture.prototype;
 Leap.SwipeGesture.prototype.direction = function(){ return this._direction; };
 Leap.SwipeGesture.prototype.pointable = function(){ return this._pointable; };
 Leap.SwipeGesture.prototype.position = function(){ return this._position; };

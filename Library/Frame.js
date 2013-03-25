@@ -138,7 +138,7 @@ Leap.Frame.prototype = {
 	
 	gesture : function(id){
 		if(this._gestureTable[id]==null) return Leap.Gesture.invalid();
-		return this._gesture[id];
+		return this._gestureTable[id];
 	},
 	
 	gestures : function(sinceFrame){
