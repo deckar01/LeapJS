@@ -956,11 +956,11 @@ Leap.Plane.prototype = {
 		
 		var x21 = this._point2.x - this._point1.x;
 		var y21 = this._point2.y - this._point1.y;
-		var z21 = this._point2.z - this._point1.z;
+		var z21 = this._point1.z - this._point2.z;
 		
 		var x31 = this._point3.x - this._point1.x;
 		var y31 = this._point3.y - this._point1.y;
-		var z31 = this._point3.z - this._point1.z;
+		var z31 = this._point1.z - this._point3.z;
 		
 		var x = y21*z31 - y31*z21;
 		var y = x21*z31 - x31*z21;
