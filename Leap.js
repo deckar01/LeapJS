@@ -1,4 +1,4 @@
-var Leap = { APIVersion : "0.7.5" };
+var Leap = { APIVersion : "0.7.6" };
 
 window.requestAnimFrame = (function(){
     return  window.requestAnimationFrame       ||
