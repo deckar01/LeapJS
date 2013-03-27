@@ -31,9 +31,9 @@ Leap.Plane.prototype = {
 	unitnormal : function(){
 		
 		var normal = this.normal();
-		if(n==null) return null;
+		if(normal==null) return null;
 		
-		this._unitnormal = n.normalized();
+		this._unitnormal = normal.normalized();
 		
 		this.unitnormal = function(){ return this._unitnormal; };
 		return this._unitnormal;
@@ -65,7 +65,7 @@ Leap.Plane.prototype = {
 		var n = this._point1.minus(rayPosition).dot(this.normal());
 		var t =  n/d;
 		
-		//if(t < 0) return null;
+		if(t < 0 && this.normal().angleTo(rayDirection) > Math.PI/2) return null;
 		
 		var intersect = rayPosition.plus(rayDirection.multiply(t));
 		var distance = t*rayDirection.magnitude();

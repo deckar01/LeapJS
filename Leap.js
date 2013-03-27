@@ -976,9 +976,9 @@ Leap.Plane.prototype = {
 	unitnormal : function(){
 		
 		var normal = this.normal();
-		if(n==null) return null;
+		if(normal==null) return null;
 		
-		this._unitnormal = n.normalized();
+		this._unitnormal = normal.normalized();
 		
 		this.unitnormal = function(){ return this._unitnormal; };
 		return this._unitnormal;
@@ -1010,7 +1010,7 @@ Leap.Plane.prototype = {
 		var n = this._point1.minus(rayPosition).dot(this.normal());
 		var t =  n/d;
 		
-		//if(t < 0) return null;
+		if(t < 0 && this.normal().angleTo(rayDirection) > Math.PI/2) return null;
 		
 		var intersect = rayPosition.plus(rayDirection.multiply(t));
 		var distance = t*rayDirection.magnitude();
@@ -1221,22 +1221,51 @@ Leap.Screen.prototype = {
 		return this._plane.pointDistance(point);
 	},
 	
-	intersect : function(pointable, normalize, clampRatio){
+	intersect : function(){
 		// TODO: Implement clampRatio
-		var intersect = this._plane.rayIntersect(pointable.tipPosition(), pointable.direction());
+		var position, direction, normalize, clampRatio;
 		
-		if(normalize){ // Normalizes to 2D pixels
-			var direction = intersect.position.minus(this._origin);
-			var x = this._xspan.dot(direction);
-			var y = this._yspan.dot(direction);
-			intersect.position = new Leap.Vector([x, y, 0]);
+		if(arguments[0] instanceof Leap.Vector){
+			position = arguments[0];
+			direction = arguments[1];
+			normalize = arguments[2];
+			clampRatio = arguments[3];
+		}
+		else{
+			position = arguments[0].tipPosition();
+			direction = arguments[0].direction();
+			normalize = arguments[1];
+			clampRatio = arguments[2];
 		}
 		
+		var intersect = this._plane.rayIntersect(position, direction);
+		if(intersect == null) return;
+		
+		if(normalize) intersect = this._toPixels(intersect);
 		return intersect;
 	},
 	
 	normal : function(){
 		return this._plane.normal();
+	},
+	
+	project : function(position, normalize, clampRatio){
+		// TODO: Implement clampRatio
+		if(!(arguments[0] instanceof Leap.Vector)) position = position.tipPosition();
+		
+		var intersect = this._plane.pointIntersect(position);
+		if(intersect == null) return;
+		
+		if(normalize) intersect = this._toPixels(intersect);
+		return intersect;
+	},
+	
+	_toPixels : function(intersect){
+		var direction = intersect.position.minus(this._origin);
+		var x = this._xspan.dot(direction);
+		var y = this._yspan.dot(direction);
+		intersect.position = new Leap.Vector([x, y, 0]);
+		return intersect;
 	},
 	
 	isValid : function(){
