@@ -987,7 +987,7 @@ Leap.Plane.prototype = {
 	pointIntersect : function(point){
 		
 		var unitnormal = this.unitnormal();
-		var distance = unitnormal.dot(this._point1.minus(point));
+		var distance = this.pointDistance(point);
 		var position = unitnormal.multiply(distance).plus(point);
 		
 		return {position: position, distance: distance};
@@ -996,7 +996,7 @@ Leap.Plane.prototype = {
 	pointDistance : function(point){
 		
 		var unitnormal = this.unitnormal();
-		var distance = unitnormal.dot(this._point1.minus(point));
+		var distance = -unitnormal.dot(this._point1.minus(point));
 		
 		return distance;
 	},
