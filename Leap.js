@@ -1010,7 +1010,7 @@ Leap.Plane.prototype = {
 		var n = this._point1.minus(rayPosition).dot(this.normal());
 		var t =  n/d;
 		
-		if(t < 0 && this.normal().angleTo(rayDirection) > Math.PI/2) return null;
+		if(t < 0 && this.normal().angleTo(rayDirection) < Math.PI/2) return null;
 		
 		var intersect = rayPosition.plus(rayDirection.multiply(t));
 		var distance = t*rayDirection.magnitude();
