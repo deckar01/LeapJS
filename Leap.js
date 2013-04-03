@@ -59,6 +59,9 @@ Leap.Calibrate = function(controller){
 	this._listener = new Leap.Listener();
 	this._listener.onFrame = function(controller){ me._fingerCount(controller); };
 	this._controller.addListener(this._listener);
+	
+	this._goodFinger = null;
+	this._deviceNormal = new Leap.Vector([0, 0, -1]);
 };
 
 Leap.Calibrate.prototype = {
@@ -73,9 +76,9 @@ Leap.Calibrate.prototype = {
 	
 	_calibrate1 : function(){
 		var pointables = this._controller.frame().pointables();
-		if(pointables.count() == 1){
+		if(this._goodFinger){
 			var me = this;
-			this._points[0] = pointables[0].tipPosition();
+			this._points[0] = this._goodFinger.tipPosition();
 			this._elem.style.cssText = this._pointCSS + this._point2CSS;
 			this._tip.style.cssText = this._tipCSS + this._point2CSS;
 			this._arrow.style.cssText = this._arrowCSS + this._point2CSS;
@@ -86,9 +89,9 @@ Leap.Calibrate.prototype = {
 	
 	_calibrate2 : function(){
 		var pointables = this._controller.frame().pointables();
-		if(pointables.count() == 1){
+		if(this._goodFinger){
 			var me = this;
-			this._points[1] = pointables[0].tipPosition();
+			this._points[1] = this._goodFinger.tipPosition();
 			this._elem.style.cssText = this._pointCSS + this._point3CSS;
 			this._tip.style.cssText = this._tipCSS + this._point3CSS;
 			this._arrow.style.cssText = this._arrowCSS + this._point3CSS;
@@ -99,8 +102,8 @@ Leap.Calibrate.prototype = {
 	
 	_calibrate3 : function(){
 		var pointables = this._controller.frame().pointables();
-		if(pointables.count() == 1){
-			this._points[2] = pointables[0].tipPosition();
+		if(this._goodFinger){
+			this._points[2] = this._goodFinger.tipPosition();
 			document.body.removeChild(this._elem);
 			document.body.removeChild(this._tip);
 			document.body.removeChild(this._arrow);
@@ -114,10 +117,18 @@ Leap.Calibrate.prototype = {
 	},
 	
 	_fingerCount : function(controller){
-		var count = controller.frame().pointables().count();
-		if(count == 0) this._elem.style.backgroundColor = "#c3cccc";
-		else if(count == 1) this._elem.style.backgroundColor = "#BCD63C";
-		else this._elem.style.backgroundColor = "#FF0000";
+		var pointables = controller.frame().pointables();
+		var count = pointables.count();
+		this._goodFinger = null;
+		for(var i=0; i < count; i++){
+			var pointable = pointables[i];
+			if(pointable.direction().angleTo(this._deviceNormal) < Math.PI/8){
+				if(this._goodFinger == null || this._goodFinger.tipPosition().z > pointable.tipPosition().z)
+					this._goodFinger = pointable;
+			}
+		}
+		if(this._goodFinger == null) this._elem.style.backgroundColor = "#c3cccc";
+		else this._elem.style.backgroundColor = "#BCD63C";
 	},
 	
 	onComplete : function(screen){}
