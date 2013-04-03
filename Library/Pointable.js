@@ -85,6 +85,10 @@ Leap.Pointable.prototype = {
 	
 	isValid : function(){
 		return this._valid;
+	},
+	
+	_delete : function(){
+		this._frame = null;
 	}
 };
 

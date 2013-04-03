@@ -196,7 +196,13 @@ Leap.Frame.prototype = {
 		return val;
 	},
 	
-	isValid : function(){ return this._valid; }
+	isValid : function(){ return this._valid; },
+	
+	_delete : function(){
+		this._gestures._delete();
+		this._hands._delete();
+		this._pointables._delete();
+	}
 };
 
 Leap.Frame.invalid = function(){

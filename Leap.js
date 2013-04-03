@@ -197,7 +197,9 @@ Leap.Controller.prototype = {
 		this._bufferBegin++;
 		if(this._bufferBegin == this._bufferSize) this._bufferBegin = 0;
 		
-		delete this._frameTable[this._frames[this._bufferBegin]._id];
+		var oldFrame = this._frames[this._bufferBegin];
+		oldFrame._delete();
+		delete this._frameTable[oldFrame._id];
 		delete this._frames[this._bufferBegin];
 		this._frameTable[newFrame._id] = newFrame;
 		this._frames[this._bufferBegin] = newFrame;
@@ -442,7 +444,13 @@ Leap.Frame.prototype = {
 		return val;
 	},
 	
-	isValid : function(){ return this._valid; }
+	isValid : function(){ return this._valid; },
+	
+	_delete : function(){
+		this._gestures._delete();
+		this._hands._delete();
+		this._pointables._delete();
+	}
 };
 
 Leap.Frame.invalid = function(){
@@ -504,7 +512,11 @@ Leap.Gesture.prototype = {
 		return "{timestamp:"+this._frame._timestamp+",id:"+this._id+",type:"+this._type+",state:"+this._state+"}";
 	},
 	
-	isValid : function(){ return this._valid; }
+	isValid : function(){ return this._valid; },
+	
+	_delete : function(){
+		this._frame = null;
+	}
 };
 
 Leap.Gesture.invalid = function(){
@@ -609,6 +621,11 @@ Leap.GestureList.prototype.count = function(){
 Leap.GestureList.prototype.empty = function(){
 
 	return this.length > 0;
+};
+
+Leap.GestureList.prototype._delete = function(){
+	
+	for(var i = 0; i < this.length; i++) this[i]._delete();
 };
 Leap.Hand = function(handData, parentFrame){
 	
@@ -787,6 +804,10 @@ Leap.Hand.prototype = {
 	
 	isValid : function(){
 		return this._valid;
+	},
+	
+	_delete : function(){
+		this._frame = null;
 	}
 };
 
@@ -812,6 +833,12 @@ Leap.HandList.prototype.empty = function(){
 
 	return this.length > 0;
 };
+
+Leap.HandList.prototype._delete = function(){
+	
+	for(var i = 0; i < this.length; i++) this[i]._delete();
+};
+
 
 Leap.Listener = function(){
 	
@@ -1106,6 +1133,10 @@ Leap.Pointable.prototype = {
 	
 	isValid : function(){
 		return this._valid;
+	},
+	
+	_delete : function(){
+		this._frame = null;
 	}
 };
 
@@ -1157,6 +1188,11 @@ Leap.PointableList.prototype.count = function(){
 
 Leap.PointableList.prototype.empty = function(){
 	return this.length>0;
+};
+
+Leap.PointableList.prototype._delete = function(){
+	
+	for(var i = 0; i < this.length; i++) this[i]._delete();
 };
 
 Leap.FingerList = function(){};

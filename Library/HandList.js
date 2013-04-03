@@ -16,3 +16,9 @@ Leap.HandList.prototype.empty = function(){
 
 	return this.length > 0;
 };
+
+Leap.HandList.prototype._delete = function(){
+	
+	for(var i = 0; i < this.length; i++) this[i]._delete();
+};
+

@@ -53,7 +53,11 @@ Leap.Gesture.prototype = {
 		return "{timestamp:"+this._frame._timestamp+",id:"+this._id+",type:"+this._type+",state:"+this._state+"}";
 	},
 	
-	isValid : function(){ return this._valid; }
+	isValid : function(){ return this._valid; },
+	
+	_delete : function(){
+		this._frame = null;
+	}
 };
 
 Leap.Gesture.invalid = function(){

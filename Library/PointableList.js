@@ -14,6 +14,11 @@ Leap.PointableList.prototype.empty = function(){
 	return this.length>0;
 };
 
+Leap.PointableList.prototype._delete = function(){
+	
+	for(var i = 0; i < this.length; i++) this[i]._delete();
+};
+
 Leap.FingerList = function(){};
 
 Leap.FingerList.prototype = new Array;

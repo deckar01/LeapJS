@@ -16,3 +16,8 @@ Leap.GestureList.prototype.empty = function(){
 
 	return this.length > 0;
 };
+
+Leap.GestureList.prototype._delete = function(){
+	
+	for(var i = 0; i < this.length; i++) this[i]._delete();
+};
