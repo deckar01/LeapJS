@@ -9,12 +9,12 @@ Leap.ScreenList.prototype.count = function(){
 
 Leap.ScreenList.prototype.empty = function(){
 
-	return this.length > 0;
+	return this.length === 0;
 };
 
 Leap.ScreenList.prototype.closestScreenHit = function(pointable){
 	
-	if(this.length < 1) return Leap.Screen.invalid();
+	if(this.empty()) return Leap.Screen.invalid();
 	
 	var closest = this[0];
 	var min = closest.intersect(pointable).distance;

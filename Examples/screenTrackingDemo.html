@@ -35,7 +35,7 @@
 
             myController.addListener(myListener);
             myListener.onConnect = function(controller){
-                if(!controller.calibratedScreens().length){
+                if(controller.calibratedScreens().empty()){
                     var calibrate = new Leap.Calibrate(controller);
                     calibrate.onComplete = function(screen){
                         isCalibrated = true;
