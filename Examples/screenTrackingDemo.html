@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+	<body background="#000">
+        <canvas id="testCanvas" width="800" height="600"></canvas>
+		<script src="../Leap.js"></script>
+		<script>
+            var myController = new Leap.Controller("ws://localhost:6437/"),
+                myListener = new Leap.Listener(),
+                isCalibrated = false,
+                canvas = document.getElementById('testCanvas'),
+                context = canvas.getContext('2d');
+
+
+            myListener.onFrame = function(controller){
+                if(!isCalibrated) return;
+
+                var frame = controller.frame(),
+                    pointables = frame.pointables();
+
+                if(pointables.length){
+                    var pointable = pointables[0],
+                        screens = controller.calibratedScreens(),
+                        screen = screens.closestScreenHit(pointable),
+                        normalizedCoords = screen.intersect(pointable, true);
+
+                    context.beginPath();
+                    context.arc(normalizedCoords.position.x, normalizedCoords.position.y, 5, 0, 2 * Math.PI, false);
+                    context.fillStyle = '#00f';
+                    context.fill();
+                    context.lineWidth = 5;
+                    context.strokeStyle = '#003300';
+                }
+
+            }
+
+            myController.addListener(myListener);
+            myListener.onConnect = function(controller){
+                if(!controller.calibratedScreens().length){
+                    var calibrate = new Leap.Calibrate(controller);
+                    calibrate.onComplete = function(screen){
+                        isCalibrated = true;
+                    }
+                }
+                else{
+                    isCalibrated = true;
+                }
+            }
+        </script>
+	</body>
+</html>
