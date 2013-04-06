@@ -1,17 +1,20 @@
-Leap.Screen = function(data){
+Leap.Screen = function(data, width, height){
 
 	this._data = data;
 	
 	if(data){
-	
+		
+		if(!("3" in data)) this._data[3] = window.innerWidth;
+		if(!("4" in data)) this._data[4] = window.innerHeight;
+		
 		this._plane = new Leap.Plane(data[0],data[1],data[2]);
 		this._center = data[0].plus(data[2]).dividedBy(2);
 		this._origin = data[1].plus(data[1].minus(this._center));
 		
 		var xv = data[2].minus(data[0]);
 		var yv = data[0].minus(data[1]);
-		var xscale = 2*xv.magnitude()/window.innerWidth;
-		var yscale = 4*yv.magnitude()/window.innerHeight;
+		var xscale = 2*xv.magnitude()/this._data[3];
+		var yscale = 4*yv.magnitude()/this._data[4];
 		this._xspan = xv.normalized().dividedBy(xscale);
 		this._yspan = yv.normalized().dividedBy(yscale);
 		

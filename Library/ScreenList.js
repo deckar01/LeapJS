@@ -4,7 +4,7 @@ Leap.ScreenList = function(){
 		var screens = JSON.parse(localStorage.screens);
 		for(var id in screens){
 			var screen = screens[id];
-			var data = [new Leap.Vector(screen[0]), new Leap.Vector(screen[1]), new Leap.Vector(screen[2])];
+			var data = [new Leap.Vector(screen[0]), new Leap.Vector(screen[1]), new Leap.Vector(screen[2]), screen[3], screen[4]];
 			this.push(new Leap.Screen(data));
 		}
 	}
