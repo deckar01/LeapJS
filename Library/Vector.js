@@ -1,19 +1,19 @@
 Leap.Vector = function(data){
 	
-	if(data instanceof Leap.Vector){
+	if(data == null){
+		this.x = 0;
+		this.y = 0;
+		this.z = 0;
+	}
+	else if("x" in data){
 		this.x = data.x;
 		this.y = data.y;
 		this.z = data.z;
 	}
-	else if(data != null){
+	else if("0" in data){
 		this.x = (typeof(data[0]) == "number")?data[0]:0;
 		this.y = (typeof(data[1]) == "number")?data[1]:0;
 		this.z = (typeof(data[2]) == "number")?data[2]:0;
-	}
-	else{
-		this.x = 0;
-		this.y = 0;
-		this.z = 0;
 	}
 };
 

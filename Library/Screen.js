@@ -1,4 +1,6 @@
 Leap.Screen = function(data){
+
+	this._data = data;
 	
 	if(data){
 	

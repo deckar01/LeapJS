@@ -112,6 +112,7 @@ Leap.Calibrate.prototype = {
 			var screen = new Leap.Screen(this._points);
 			this._controller._screens.push(screen);
 			this._controller.removeListener(this._listener);
+			this._controller._screens.save();
 			this.onComplete(screen);
 		}
 	},
@@ -1239,6 +1240,8 @@ Leap.ToolList.prototype.append = function(other){
 };
 
 Leap.Screen = function(data){
+
+	this._data = data;
 	
 	if(data){
 	
@@ -1321,7 +1324,17 @@ Leap.Screen.prototype = {
 };
 
 Leap.Screen.invalid = function(){ return new Leap.Screen(); }
-Leap.ScreenList = function(){};
+Leap.ScreenList = function(){
+	
+	if(localStorage.screens){
+		var screens = JSON.parse(localStorage.screens);
+		for(var id in screens){
+			var screen = screens[id];
+			var data = [new Leap.Vector(screen[0]), new Leap.Vector(screen[1]), new Leap.Vector(screen[2])];
+			this.push(new Leap.Screen(data));
+		}
+	}
+};
 
 Leap.ScreenList.prototype = new Array;
 
@@ -1355,22 +1368,41 @@ Leap.ScreenList.prototype.closestScreenHit = function(pointable){
 	return closest;
 };
 
+Leap.ScreenList.prototype.save = function(){
+
+	var screenData = [];
+	for(var i = 0; i < this.length; i++) screenData.push(this[i]._data);
+	localStorage.screens = JSON.stringify(screenData);
+};
+
+Leap.ScreenList.prototype.save = function(){
+
+	var screenData = [];
+	for(var i = 0; i < this.length; i++) screenData.push(this[i]._data);
+	localStorage.screens = JSON.stringify(screenData);
+};
+
+Leap.ScreenList.prototype.clear = function(){
+
+	this.length = 0;
+	this.save();
+};
 Leap.Vector = function(data){
 	
-	if(data instanceof Leap.Vector){
+	if(data == null){
+		this.x = 0;
+		this.y = 0;
+		this.z = 0;
+	}
+	else if("x" in data){
 		this.x = data.x;
 		this.y = data.y;
 		this.z = data.z;
 	}
-	else if(data != null){
+	else if("0" in data){
 		this.x = (typeof(data[0]) == "number")?data[0]:0;
 		this.y = (typeof(data[1]) == "number")?data[1]:0;
 		this.z = (typeof(data[2]) == "number")?data[2]:0;
-	}
-	else{
-		this.x = 0;
-		this.y = 0;
-		this.z = 0;
 	}
 };
 
