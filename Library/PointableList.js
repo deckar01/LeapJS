@@ -11,7 +11,7 @@ Leap.PointableList.prototype.count = function(){
 };
 
 Leap.PointableList.prototype.empty = function(){
-	return this.length>0;
+	return this.length === 0;
 };
 
 Leap.PointableList.prototype._delete = function(){

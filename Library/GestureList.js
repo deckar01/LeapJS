@@ -14,7 +14,7 @@ Leap.GestureList.prototype.count = function(){
 
 Leap.GestureList.prototype.empty = function(){
 
-	return this.length > 0;
+	return this.length === 0;
 };
 
 Leap.GestureList.prototype._delete = function(){

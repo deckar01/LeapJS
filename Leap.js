@@ -647,7 +647,7 @@ Leap.GestureList.prototype.count = function(){
 
 Leap.GestureList.prototype.empty = function(){
 
-	return this.length > 0;
+	return this.length === 0;
 };
 
 Leap.GestureList.prototype._delete = function(){
@@ -858,7 +858,7 @@ Leap.HandList.prototype.count = function(){
 
 Leap.HandList.prototype.empty = function(){
 
-	return this.length > 0;
+	return this.length === 0;
 };
 
 Leap.HandList.prototype._delete = function(){
@@ -1214,7 +1214,7 @@ Leap.PointableList.prototype.count = function(){
 };
 
 Leap.PointableList.prototype.empty = function(){
-	return this.length>0;
+	return this.length === 0;
 };
 
 Leap.PointableList.prototype._delete = function(){
@@ -1332,21 +1332,23 @@ Leap.ScreenList.prototype.count = function(){
 
 Leap.ScreenList.prototype.empty = function(){
 
-	return this.length > 0;
+	return this.length === 0;
 };
 
 Leap.ScreenList.prototype.closestScreenHit = function(pointable){
 	
-	if(this.length < 1) return Leap.Screen.invalid();
+	if(this.empty()) return Leap.Screen.invalid();
 	
-	var closest = this[0];
-	var min = closest.intersect(pointable).distance;
+	var closest = Leap.Screen.invalid();
+	var min;
 	
-	for(var index = 1; index < this.length; index++){
-		var distance = this[index].intersect(pointable).distance;
-		if(distance < min){
+	for(var index = 0; index < this.length; index++){
+	
+		var hit = this[index].intersect(pointable);
+		
+		if(hit && (closest._valid == false || hit.distance < min)){
 			closest = this[index];
-			min = distance;
+			min = hit.distance;
 		}
 	}
 	

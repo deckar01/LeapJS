@@ -14,7 +14,7 @@ Leap.HandList.prototype.count = function(){
 
 Leap.HandList.prototype.empty = function(){
 
-	return this.length > 0;
+	return this.length === 0;
 };
 
 Leap.HandList.prototype._delete = function(){

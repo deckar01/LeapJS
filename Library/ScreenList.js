@@ -16,14 +16,16 @@ Leap.ScreenList.prototype.closestScreenHit = function(pointable){
 	
 	if(this.empty()) return Leap.Screen.invalid();
 	
-	var closest = this[0];
-	var min = closest.intersect(pointable).distance;
+	var closest = Leap.Screen.invalid();
+	var min;
 	
-	for(var index = 1; index < this.length; index++){
-		var distance = this[index].intersect(pointable).distance;
-		if(distance < min){
+	for(var index = 0; index < this.length; index++){
+	
+		var hit = this[index].intersect(pointable);
+		
+		if(hit && (closest._valid == false || hit.distance < min)){
 			closest = this[index];
-			min = distance;
+			min = hit.distance;
 		}
 	}
 	
