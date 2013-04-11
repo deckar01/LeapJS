@@ -1268,7 +1268,13 @@ Leap.Screen = function(data, width, height){
 	}
 	else{
 	
-		this._plane = null;
+		this._plane = new Leap.Plane();
+		this._center = new Leap.Vector();
+		this._origin = new Leap.Vector();
+		this._xspan = new Leap.Vector();
+		this._yspan = new Leap.Vector();
+		this._data = [new Leap.Vector(), new Leap.Vector(), new Leap.Vector(), 0, 0, 0, 0];
+		
 		this._valid = false;
 	}
 };
