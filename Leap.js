@@ -111,8 +111,9 @@ Leap.Calibrate.prototype = {
 			
 			var screen = new Leap.Screen(this._points);
 			this._controller._screens.push(screen);
-			this._controller.removeListener(this._listener);
 			this._controller._screens.save();
+			
+			this._controller.removeListener(this._listener);
 			this.onComplete(screen);
 		}
 	},
@@ -145,7 +146,7 @@ Leap.Controller = function(connection){
 	this._listeners = {};
 	this._listenerId = 0;
 	
-	this._bufferSize = 1024;
+	this._bufferSize = 64;
 	this._bufferBegin = 0;
 	
 	this._screens = new Leap.ScreenList();
@@ -1247,6 +1248,10 @@ Leap.Screen = function(data, width, height){
 		
 		if(!("3" in data)) this._data[3] = window.innerWidth;
 		if(!("4" in data)) this._data[4] = window.innerHeight;
+		if(!("5" in data)) this._data[5] = window.screenX;
+		if(!("6" in data)) this._data[6] = window.screenY;
+		
+		this._offset();
 		
 		this._plane = new Leap.Plane(data[0],data[1],data[2]);
 		this._center = data[0].plus(data[2]).dividedBy(2);
@@ -1315,10 +1320,15 @@ Leap.Screen.prototype = {
 	
 	_toPixels : function(intersect){
 		var direction = intersect.position.minus(this._origin);
-		var x = this._xspan.dot(direction);
-		var y = this._yspan.dot(direction);
+		var x = this._xspan.dot(direction) + this.x;
+		var y = this._yspan.dot(direction) + this.y;
 		intersect.position = new Leap.Vector([x, y, 0]);
 		return intersect;
+	},
+	
+	_offset : function(){
+		this.x = this._data[5] - window.screenX;
+		this.y = this._data[6] - window.screenY;
 	},
 	
 	isValid : function(){
@@ -1333,7 +1343,7 @@ Leap.ScreenList = function(){
 		var screens = JSON.parse(localStorage.screens);
 		for(var id in screens){
 			var screen = screens[id];
-			var data = [new Leap.Vector(screen[0]), new Leap.Vector(screen[1]), new Leap.Vector(screen[2]), screen[3], screen[4]];
+			var data = [new Leap.Vector(screen[0]), new Leap.Vector(screen[1]), new Leap.Vector(screen[2]), screen[3], screen[4], screen[5], screen[6]];
 			this.push(new Leap.Screen(data));
 		}
 	}
@@ -1369,13 +1379,6 @@ Leap.ScreenList.prototype.closestScreenHit = function(pointable){
 	}
 	
 	return closest;
-};
-
-Leap.ScreenList.prototype.save = function(){
-
-	var screenData = [];
-	for(var i = 0; i < this.length; i++) screenData.push(this[i]._data);
-	localStorage.screens = JSON.stringify(screenData);
 };
 
 Leap.ScreenList.prototype.save = function(){

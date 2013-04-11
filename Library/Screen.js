@@ -6,6 +6,10 @@ Leap.Screen = function(data, width, height){
 		
 		if(!("3" in data)) this._data[3] = window.innerWidth;
 		if(!("4" in data)) this._data[4] = window.innerHeight;
+		if(!("5" in data)) this._data[5] = window.screenX;
+		if(!("6" in data)) this._data[6] = window.screenY;
+		
+		this._offset();
 		
 		this._plane = new Leap.Plane(data[0],data[1],data[2]);
 		this._center = data[0].plus(data[2]).dividedBy(2);
@@ -74,10 +78,15 @@ Leap.Screen.prototype = {
 	
 	_toPixels : function(intersect){
 		var direction = intersect.position.minus(this._origin);
-		var x = this._xspan.dot(direction);
-		var y = this._yspan.dot(direction);
+		var x = this._xspan.dot(direction) + this.x;
+		var y = this._yspan.dot(direction) + this.y;
 		intersect.position = new Leap.Vector([x, y, 0]);
 		return intersect;
+	},
+	
+	_offset : function(){
+		this.x = this._data[5] - window.screenX;
+		this.y = this._data[6] - window.screenY;
 	},
 	
 	isValid : function(){

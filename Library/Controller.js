@@ -8,7 +8,7 @@ Leap.Controller = function(connection){
 	this._listeners = {};
 	this._listenerId = 0;
 	
-	this._bufferSize = 1024;
+	this._bufferSize = 64;
 	this._bufferBegin = 0;
 	
 	this._screens = new Leap.ScreenList();

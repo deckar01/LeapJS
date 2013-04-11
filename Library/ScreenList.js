@@ -4,7 +4,7 @@ Leap.ScreenList = function(){
 		var screens = JSON.parse(localStorage.screens);
 		for(var id in screens){
 			var screen = screens[id];
-			var data = [new Leap.Vector(screen[0]), new Leap.Vector(screen[1]), new Leap.Vector(screen[2]), screen[3], screen[4]];
+			var data = [new Leap.Vector(screen[0]), new Leap.Vector(screen[1]), new Leap.Vector(screen[2]), screen[3], screen[4], screen[5], screen[6]];
 			this.push(new Leap.Screen(data));
 		}
 	}
@@ -40,13 +40,6 @@ Leap.ScreenList.prototype.closestScreenHit = function(pointable){
 	}
 	
 	return closest;
-};
-
-Leap.ScreenList.prototype.save = function(){
-
-	var screenData = [];
-	for(var i = 0; i < this.length; i++) screenData.push(this[i]._data);
-	localStorage.screens = JSON.stringify(screenData);
 };
 
 Leap.ScreenList.prototype.save = function(){

@@ -76,8 +76,9 @@ Leap.Calibrate.prototype = {
 			
 			var screen = new Leap.Screen(this._points);
 			this._controller._screens.push(screen);
-			this._controller.removeListener(this._listener);
 			this._controller._screens.save();
+			
+			this._controller.removeListener(this._listener);
 			this.onComplete(screen);
 		}
 	},
