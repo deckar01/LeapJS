@@ -1251,7 +1251,7 @@ Leap.Screen = function(data, width, height){
 		if(!("5" in data)) this._data[5] = window.screenX;
 		if(!("6" in data)) this._data[6] = window.screenY;
 		
-		this._offset();
+		this.offset();
 		
 		this._plane = new Leap.Plane(data[0],data[1],data[2]);
 		this._center = data[0].plus(data[2]).dividedBy(2);
@@ -1326,7 +1326,7 @@ Leap.Screen.prototype = {
 		return intersect;
 	},
 	
-	_offset : function(){
+	offset : function(){
 		this.x = this._data[5] - window.screenX;
 		this.y = this._data[6] - window.screenY;
 	},
