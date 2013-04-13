@@ -109,6 +109,12 @@ function drawHand(hand){
 		buffercx1.lineTo(x-hand.palmNormal().z*radius, y-hand.palmNormal().y*radius);
 		buffercx1.strokeStyle = 'red';
 		buffercx1.stroke();
+		
+		buffercx1.beginPath()
+		buffercx1.moveTo(x, y);
+		buffercx1.lineTo(x-hand.direction().z*radius, y-hand.direction().y*radius);
+		buffercx1.strokeStyle = 'red';
+		buffercx1.stroke();
 	
 		buffercx1.beginPath();
 		buffercx1.arc(x, y, radius, 0, 2 * Math.PI, false);
@@ -126,6 +132,12 @@ function drawHand(hand){
 		buffercx2.beginPath();
 		buffercx2.moveTo(x, y);
 		buffercx2.lineTo(x+hand.palmNormal().x*radius, y+hand.palmNormal().z*radius);
+		buffercx2.strokeStyle = 'red';
+		buffercx2.stroke();
+		
+		buffercx2.beginPath();
+		buffercx2.moveTo(x, y);
+		buffercx2.lineTo(x+hand.direction().x*radius, y+hand.direction().z*radius);
 		buffercx2.strokeStyle = 'red';
 		buffercx2.stroke();
 	

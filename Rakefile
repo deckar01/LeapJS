@@ -1,12 +1,16 @@
 require 'erb'
 require 'uglifier'
 
-def load_file(path)
+def load_file(prepath, path)
+  raise "nothing at #{prepath}" if Dir[prepath].empty?
   raise "nothing at #{path}" if Dir[path].empty?
+  prefiles = Dir[prepath].to_a.sort.map do |f|
+    File.read(f)
+  end
   files = Dir[path].to_a.sort.map do |f|
     File.read(f)
   end
-  files.join("\n")
+  prefiles.join("\n") + files.join("\n")
 end
 
 file

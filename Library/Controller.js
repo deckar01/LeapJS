@@ -52,6 +52,11 @@ Leap.Controller.prototype = {
 		// Requires additional data form WebSocket server
 	},
 	
+	locatedScreens : function(){
+		return this._screens;
+	},
+	
+	// Depricated
 	calibratedScreens : function(){
 		return this._screens;
 	},

@@ -1,6 +1,25 @@
-var Leap = { APIVersion : "0.7.6" };
+var Leap = { APIVersion : "0.7.7" };
 
-window.requestAnimFrame = (function(){
+Leap._List = function(){};
+
+Leap._List.prototype = new Array;
+
+Leap._List.prototype.count = function(){
+	return this.length;
+};
+
+Leap._List.prototype.isEmpty = function(){
+	return this.length === 0;
+};
+
+// Depricated
+Leap._List.prototype.empty = function(){
+	return this.length === 0;
+};
+
+Leap._List.prototype._delete = function(){
+	for(var i = 0; i < this.length; i++) this[i]._delete();
+};window.requestAnimFrame = (function(){
     return  window.requestAnimationFrame       ||
     window.webkitRequestAnimationFrame ||
     window.mozRequestAnimationFrame    ||
@@ -190,6 +209,11 @@ Leap.Controller.prototype = {
 		// Requires additional data form WebSocket server
 	},
 	
+	locatedScreens : function(){
+		return this._screens;
+	},
+	
+	// Depricated
 	calibratedScreens : function(){
 		return this._screens;
 	},
@@ -273,6 +297,14 @@ Leap.Controller.prototype = {
 			this.onclose(event);
 		};
 	}
+};
+
+Leap.FingerList = function(){};
+
+Leap.FingerList.prototype = Leap._List.prototype;
+
+Leap.FingerList.prototype.append = function(other){
+	for(i = 0; i < other.length; i++) this.push(new Leap.Finger(other[i]));
 };
 
 Leap.Frame = function(frameData, controller){
@@ -635,27 +667,13 @@ Leap.Gesture.Type = {
 
 Leap.GestureList = function(){};
 
-Leap.GestureList.prototype = new Array;
+Leap.GestureList.prototype = Leap._List.prototype;
 
 Leap.GestureList.prototype.append = function(other){
 
 	for(i = 0; i < other.length; i++) this.push(new Leap.Gesture(other[i]));
 };
 
-Leap.GestureList.prototype.count = function(){
-
-	return this.length;
-};
-
-Leap.GestureList.prototype.empty = function(){
-
-	return this.length === 0;
-};
-
-Leap.GestureList.prototype._delete = function(){
-	
-	for(var i = 0; i < this.length; i++) this[i]._delete();
-};
 Leap.Hand = function(handData, parentFrame){
 	
 	this._fingers = new Leap.FingerList();
@@ -846,28 +864,12 @@ Leap.Hand.invalid = function(){
 
 Leap.HandList = function(){};
 
-Leap.HandList.prototype = new Array;
+Leap.HandList.prototype = Leap._List.prototype;
 
 Leap.HandList.prototype.append = function(other){
 
 	for(i = 0; i < other.length; i++) this.push(new Leap.Hand(other[i]));
 };
-
-Leap.HandList.prototype.count = function(){
-
-	return this.length;
-};
-
-Leap.HandList.prototype.empty = function(){
-
-	return this.length === 0;
-};
-
-Leap.HandList.prototype._delete = function(){
-	
-	for(var i = 0; i < this.length; i++) this[i]._delete();
-};
-
 
 Leap.Listener = function(){
 	
@@ -1205,39 +1207,10 @@ Leap.Tool.invalid = function(){
 
 Leap.PointableList = function(){};
 
-Leap.PointableList.prototype = new Array;
+Leap.PointableList.prototype = Leap._List.prototype;
 
 Leap.PointableList.prototype.append = function(other){
 	for(i=0; i<other.length; i++) this.push(new Leap.Pointable(other[i]));
-};
-
-Leap.PointableList.prototype.count = function(){
-	return this.length;
-};
-
-Leap.PointableList.prototype.empty = function(){
-	return this.length === 0;
-};
-
-Leap.PointableList.prototype._delete = function(){
-	
-	for(var i = 0; i < this.length; i++) this[i]._delete();
-};
-
-Leap.FingerList = function(){};
-
-Leap.FingerList.prototype = Leap.PointableList.prototype;
-
-Leap.FingerList.prototype.append = function(other){
-	for(i = 0; i < other.length; i++) this.push(new Leap.Finger(other[i]));
-};
-
-Leap.ToolList = function(){};
-
-Leap.ToolList.prototype = Leap.PointableList.prototype;
-
-Leap.ToolList.prototype.append = function(other){
-	for(i=0; i<other.length; i++) this.push(new Leap.Tool(other[i]));
 };
 
 Leap.Screen = function(data, width, height){
@@ -1358,17 +1331,7 @@ Leap.ScreenList = function(){
 	}
 };
 
-Leap.ScreenList.prototype = new Array;
-
-Leap.ScreenList.prototype.count = function(){
-
-	return this.length;
-};
-
-Leap.ScreenList.prototype.empty = function(){
-
-	return this.length === 0;
-};
+Leap.ScreenList.prototype = Leap._List.prototype;
 
 Leap.ScreenList.prototype.closestScreenHit = function(pointable){
 	
@@ -1402,6 +1365,14 @@ Leap.ScreenList.prototype.clear = function(){
 	this.length = 0;
 	this.save();
 };
+Leap.ToolList = function(){};
+
+Leap.ToolList.prototype = Leap._List.prototype;
+
+Leap.ToolList.prototype.append = function(other){
+	for(i=0; i<other.length; i++) this.push(new Leap.Tool(other[i]));
+};
+
 Leap.Vector = function(data){
 	
 	if(data == null){

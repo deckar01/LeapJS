@@ -13,17 +13,7 @@ Leap.ScreenList = function(){
 	}
 };
 
-Leap.ScreenList.prototype = new Array;
-
-Leap.ScreenList.prototype.count = function(){
-
-	return this.length;
-};
-
-Leap.ScreenList.prototype.empty = function(){
-
-	return this.length === 0;
-};
+Leap.ScreenList.prototype = Leap._List.prototype;
 
 Leap.ScreenList.prototype.closestScreenHit = function(pointable){
 	
