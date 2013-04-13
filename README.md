@@ -85,6 +85,7 @@ myListener.onConnect = function(controller){
   * { **position** : _Vector_, **distance** : _float_ } **project**( _Pointable_ **pointable**, _Bool_ **normalize** )
   * { **position** : _Vector_, **distance** : _float_ } **project**( _Vector_ **position**, _Bool_ **normalize** )
   * _Vector_ **normal**()
+  * _void_ **offset**()
   * _Bool_ **isValid**()
   * _static Screen_ **invalid**()
 
