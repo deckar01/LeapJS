@@ -71,20 +71,14 @@ Leap.Vector.prototype = {
 	},
 	
 	pitch : function(){
-		//var proj = new Leap.Vector([0,this.y,this.z]);
-		//return Leap.vectors.forward().angleTo(proj);
 		return Math.atan2(this.y, -this.z);
 	},
 	
 	roll : function(){
-		//var proj = new Leap.Vector([this.x,this.y,0]);
-		//return Leap.vectors.down().angleTo(proj);
 		return Math.atan2(this.x, -this.y);
 	},
 	
 	yaw : function(){
-		//var proj = new Leap.Vector([this.x,0,this.z]);
-		//return Leap.vectors.forward().angleTo(proj);
 		return Math.atan2(this.x, -this.z);
 	},
 	

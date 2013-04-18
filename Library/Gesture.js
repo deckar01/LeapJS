@@ -131,16 +131,16 @@ Leap.SwipeGesture.prototype.speed = function(){ return this._speed; };
 Leap.SwipeGesture.prototype.startPosition = function(){ return this._startPosition; };
 
 Leap.Gesture.State = {
-	"invalid" : "invalid",
-	"start" : "start",
-	"stop" : "stop",
-	"update" : "update"
+	invalid : "invalid",
+	start : "start",
+	stop : "stop",
+	update : "update"
 };
 
 Leap.Gesture.Type = {
-	"invalid" : Leap.Gesture.invalid,
-	"circle" : Leap.CircleGesture,
-	"keyTap" : Leap.KeyTapGesture,
-	"screenTap" : Leap.ScreenTapGesture,
-	"swipe" : Leap.SwipeGesture
+	invalid : Leap.Gesture.invalid,
+	circle : Leap.CircleGesture,
+	keyTap : Leap.KeyTapGesture,
+	screenTap : Leap.ScreenTapGesture,
+	swipe : Leap.SwipeGesture
 };

@@ -4,8 +4,8 @@ Leap.Pointable = function(pointableData, parentHand, obj){
 	
 	if(pointableData == null){
 	
-		obj._frame = null;
-		obj._hand = null;
+		obj._frame = Leap.Frame.invalid();
+		obj._hand = Leap.Hand.invalid();
 		obj._id = null;
 		obj._valid = false;
 		
@@ -13,12 +13,12 @@ Leap.Pointable = function(pointableData, parentHand, obj){
 		obj._tipPosition = new Leap.Vector();
 		obj._tipVelocity = new Leap.Vector();
 		
-		obj._length = null;
-		obj._width = null;
+		obj._length = 0;
+		obj._width = 0;
 	}
 	else{
 		
-		obj._frame = (parentHand)?parentHand._frame:null;
+		obj._frame = (parentHand)?parentHand._frame:Leap.Frame.invalid();
 		obj._hand = parentHand;
 		obj._id = pointableData.id;
 		obj._valid = true;
@@ -94,34 +94,4 @@ Leap.Pointable.prototype = {
 
 Leap.Pointable.invalid = function(){
 	return new Leap.Pointable();
-};
-
-/* Finger */
-Leap.Finger = function(fingerData, parentHand){
-	
-	Leap.Pointable(fingerData, parentHand, this);
-	
-	this._isFinger = true;
-	this._isTool = false;
-};
-
-Leap.Finger.prototype = Leap.Pointable.prototype;
-
-Leap.Finger.invalid = function(){
-	return new Leap.Finger();
-};
-
-/* Tool */
-Leap.Tool = function(toolData, parentHand){
-
-	Leap.Pointable(toolData, parentHand, this);
-	
-	this._isTool = true;
-	this._isFinger = false;
-};
-
-Leap.Tool.prototype = Leap.Pointable.prototype;
-
-Leap.Tool.invalid = function(){
-	return new Leap.Tool();
 };
