@@ -15,8 +15,8 @@ Leap.Pointable = function(pointableData, parentHand, obj){
 		obj._tipPosition = new Leap.Vector();
 		obj._tipVelocity = new Leap.Vector();
 		
-		obj._length = 0;
-		obj._width = 0;
+		obj._length = null;
+		obj._width = null;
 	}
 	else{
 		
@@ -793,7 +793,7 @@ Leap.Hand = function(handData, parentFrame){
 	
 	if(handData == null){
 	
-		this._frame = null;
+		this._frame = Leap.Frame.invalid();
 		this._id = null;
 		this._valid = false;
 		
@@ -1136,9 +1136,8 @@ Leap.Plane.prototype = {
 	unitnormal : function(){
 		
 		var normal = this.normal();
-		if(normal==null) return null;
-		
-		this._unitnormal = normal.normalized();
+		if(normal==null) this._unitnormal = null;
+		else this._unitnormal = normal.normalized();
 		
 		this.unitnormal = function(){ return this._unitnormal; };
 		return this._unitnormal;

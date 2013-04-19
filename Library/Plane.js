@@ -31,9 +31,8 @@ Leap.Plane.prototype = {
 	unitnormal : function(){
 		
 		var normal = this.normal();
-		if(normal==null) return null;
-		
-		this._unitnormal = normal.normalized();
+		if(normal==null) this._unitnormal = null;
+		else this._unitnormal = normal.normalized();
 		
 		this.unitnormal = function(){ return this._unitnormal; };
 		return this._unitnormal;

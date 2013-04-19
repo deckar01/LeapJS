@@ -13,8 +13,8 @@ Leap.Pointable = function(pointableData, parentHand, obj){
 		obj._tipPosition = new Leap.Vector();
 		obj._tipVelocity = new Leap.Vector();
 		
-		obj._length = 0;
-		obj._width = 0;
+		obj._length = null;
+		obj._width = null;
 	}
 	else{
 		

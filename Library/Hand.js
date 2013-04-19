@@ -10,7 +10,7 @@ Leap.Hand = function(handData, parentFrame){
 	
 	if(handData == null){
 	
-		this._frame = null;
+		this._frame = Leap.Frame.invalid();
 		this._id = null;
 		this._valid = false;
 		
