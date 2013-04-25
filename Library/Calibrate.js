@@ -12,7 +12,7 @@ Leap.Calibrate = function(controller){
 	
 	this._tip = document.createElement("div");
 	this._tip.style.cssText = this._tipCSS + this._point1CSS;
-	this._tip.innerHTML = "Position one finger on the square<br>until it turns green then click it.";
+	this._tip.innerHTML = "Position one finger on the square<br>until it turns green then press the spacebar.";
 	this._arrow = document.createElement("div");
 	this._arrow.style.cssText = this._arrowCSS + this._point1CSS;
 	
@@ -27,10 +27,13 @@ Leap.Calibrate = function(controller){
 	
 	this._goodFinger = null;
 	this._deviceNormal = new Leap.Vector([0, 0, -1]);
+
+	window.onkeyup = function(e){ me._onKeyUp(e); };
 };
 
 Leap.Calibrate.prototype = {
 	
+	_step: 1,
 	_pointCSS : "width: 20px; height: 20px; padding: 10px; margin: -20px; position: fixed; text-align: center; background-color: #c3cccc; color: #ffffff; cursor: pointer; ",
 	_point1CSS : "left: 25%; top: 50%;",
 	_point2CSS : "left: 25%; top: 25%;",
@@ -39,6 +42,23 @@ Leap.Calibrate.prototype = {
 	_tipCSS : "height: 32px; padding-top: 4px; padding-bottom: 4px; padding-left: 8px; padding-right: 8px; margin-top: -20px; margin-left: 26px; border-radius: 5px; position: fixed; background-color: rgba(0,0,0,0.7); color: #FFFFFF;",
 	_arrowCSS : "height: 0; width: 0; border: 6px solid; border-color: transparent rgba(0,0,0,0.7) transparent transparent; margin-top: -6px; margin-left: 14px; position: fixed;",
 	
+	_onKeyUp : function(event){
+		if(event.keyCode === 32){
+			switch(this._step){
+				case 1: 
+					this._calibrate1();
+					break;
+				case 2:
+					this._calibrate2();
+					break;
+				case 3:
+					this._calibrate3();
+					break;
+			}
+			this._step++;
+		}
+	},
+
 	_calibrate1 : function(){
 		var pointables = this._controller.frame().pointables();
 		if(this._goodFinger){
