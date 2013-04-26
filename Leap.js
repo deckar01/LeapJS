@@ -164,11 +164,15 @@ Leap.Calibrate = function(controller){
 	this._elem.style.cssText = this._pointCSS + this._point1CSS;
 	this._elem.innerHTML = "1";
 	
-	this._elem.onclick = function(){ me._calibrate1(); };
+	this._action = this._calibrate1;
+	this._elem.onclick = function(){ me._action(); };
+	window.onkeyup = function(e){
+		if(e.keyCode === 32) me._action();
+	};
 	
 	this._tip = document.createElement("div");
 	this._tip.style.cssText = this._tipCSS + this._point1CSS;
-	this._tip.innerHTML = "Position one finger on the square<br>until it turns green then click it.";
+	this._tip.innerHTML = "Position one finger on the square until<br>it turns green then click it or press space.";
 	this._arrow = document.createElement("div");
 	this._arrow.style.cssText = this._arrowCSS + this._point1CSS;
 	
@@ -192,32 +196,30 @@ Leap.Calibrate.prototype = {
 	_point2CSS : "left: 25%; top: 25%;",
 	_point3CSS : "left: 75%; top: 50%;",
 	
-	_tipCSS : "height: 32px; padding-top: 4px; padding-bottom: 4px; padding-left: 8px; padding-right: 8px; margin-top: -20px; margin-left: 26px; border-radius: 5px; position: fixed; background-color: rgba(0,0,0,0.7); color: #FFFFFF;",
+	_tipCSS : "height: 32px; padding-top: 4px; padding-bottom: 4px; padding-left: 8px; padding-right: 8px; margin-top: -20px; margin-left: 26px; border-radius: 5px; position: fixed; background-color: rgba(0,0,0,0.7); color: #FFFFFF; font: 14px Helvetica, Sans-Serif;",
 	_arrowCSS : "height: 0; width: 0; border: 6px solid; border-color: transparent rgba(0,0,0,0.7) transparent transparent; margin-top: -6px; margin-left: 14px; position: fixed;",
 	
 	_calibrate1 : function(){
 		var pointables = this._controller.frame().pointables();
 		if(this._goodFinger){
-			var me = this;
 			this._points[0] = this._goodFinger.tipPosition();
 			this._elem.style.cssText = this._pointCSS + this._point2CSS;
 			this._tip.style.cssText = this._tipCSS + this._point2CSS;
 			this._arrow.style.cssText = this._arrowCSS + this._point2CSS;
 			this._elem.innerHTML = "2";
-			this._elem.onclick = function(){ me._calibrate2(); };
+			this._action = this._calibrate2;
 		}
 	},
 	
 	_calibrate2 : function(){
 		var pointables = this._controller.frame().pointables();
 		if(this._goodFinger){
-			var me = this;
 			this._points[1] = this._goodFinger.tipPosition();
 			this._elem.style.cssText = this._pointCSS + this._point3CSS;
 			this._tip.style.cssText = this._tipCSS + this._point3CSS;
 			this._arrow.style.cssText = this._arrowCSS + this._point3CSS;
 			this._elem.innerHTML = "3";
-			this._elem.onclick = function(){ me._calibrate3(); };
+			this._action = this._calibrate3;
 		}
 	},
 	

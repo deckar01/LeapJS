@@ -15,20 +15,23 @@
                 if(!isCalibrated) return;
 
                 var frame = controller.frame(),
-                    pointables = frame.pointables();
+                    pointables = frame.pointables(),
+					screens = controller.calibratedScreens();
 
-                if(pointables.length){
-                    var pointable = pointables[0],
-                        screens = controller.calibratedScreens(),
-                        screen = screens.closestScreenHit(pointable),
-                        normalizedCoords = screen.intersect(pointable, true);
+                for(var index = 0; index < pointables.length; index++){
+                    var pointable = pointables[index],
+                        screen = screens.closestScreenHit(pointable);
+					
+                    if(screen.isValid()){
+						var normalizedCoords = screen.intersect(pointable, true);
 
-                    context.beginPath();
-                    context.arc(normalizedCoords.position.x, normalizedCoords.position.y, 5, 0, 2 * Math.PI, false);
-                    context.fillStyle = '#00f';
-                    context.fill();
-                    context.lineWidth = 5;
-                    context.strokeStyle = '#003300';
+						context.beginPath();
+						context.arc(normalizedCoords.position.x, normalizedCoords.position.y, 5, 0, 2 * Math.PI, false);
+						context.fillStyle = '#00f';
+						context.fill();
+						context.lineWidth = 5;
+						context.strokeStyle = '#003300';
+					}
                 }
 
             }
