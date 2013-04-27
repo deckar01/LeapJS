@@ -99,7 +99,7 @@ Leap.Hand.prototype = {
 		var y = this._rotation.xBasis.z - sinceHand._rotation.zBasis.x;
 		var z = this._rotation.yBasis.x - sinceHand._rotation.xBasis.y;
 		var vec = new Leap.Vector([x, y, z]);
-		return vec.normalize();
+		return vec.normalized();
 	},
 	
 	rotationMatrix : function(sinceFrame){

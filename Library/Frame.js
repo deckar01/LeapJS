@@ -102,7 +102,7 @@ Leap.Frame.prototype = {
 		var y = this._rotation.xBasis.z - sinceFrame._rotation.zBasis.x;
 		var z = this._rotation.yBasis.x - sinceFrame._rotation.xBasis.y;
 		var vec = new Leap.Vector([x, y, z]);
-		return vec.normalize();
+		return vec.normalized();
 	},
 	
 	rotationMatrix : function(sinceFrame){
