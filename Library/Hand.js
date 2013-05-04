@@ -79,15 +79,20 @@ Leap.Hand.prototype = {
 	},
 	
 	rotationAngle : function(sinceFrame, axis){
-		// TODO: implement axis parameter
 		if (!this._valid || !sinceFrame._valid) return 0.0;
-		var sinceHand = sinceFrame.hand(this._id);
-		if(!sinceHand._valid) return 0.0;
-		
-		var rot = this.rotationMatrix(sinceFrame);
-		var cs = (rot.xBasis.x + rot.yBasis.y + rot.zBasis.z - 1.0)*0.5
-		var angle = Math.acos(cs);
-		return isNaN(angle) ? 0.0 : angle;
+		if(!axis) {
+            var sinceHand = sinceFrame.hand(this._id);
+            if(!sinceHand._valid) return 0.0;
+
+            var rot = this.rotationMatrix(sinceFrame);
+            var cs = (rot.xBasis.x + rot.yBasis.y + rot.zBasis.z - 1.0)*0.5
+            var angle = Math.acos(cs);
+            return isNaN(angle) ? 0.0 : angle;
+        } else {
+            var rotAxis = this.rotationAxis( sinceFrame.hand( this._id ).frame );
+            var rotAngle = this.rotationAngle( sinceFrame.hand( this._id ).frame );
+            return rotAngle * rotAxis.dot( axis.normalized() );
+        }
 	},
 	
 	rotationAxis : function(sinceFrame){
