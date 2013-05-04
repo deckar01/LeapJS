@@ -89,16 +89,17 @@ Leap.Frame.prototype = {
 	
 	rotationAngle : function(sinceFrame, axis){
         if (!this._valid || !sinceFrame._valid) return 0.0;
-        if(!axis) {
-            var rot = this.rotationMatrix(sinceFrame);
-            var cs = (rot.xBasis.x + rot.yBasis.y + rot.zBasis.z - 1.0)*0.5
-            var angle = Math.acos(cs);
-            return isNaN(angle) ? 0.0 : angle;
-        } else {
-            var rotAxis = this.rotationAxis( sinceFrame );
-            var rotAngle = this.rotationAngle( sinceFrame );
-            return rotAngle * rotAxis.dot( axis.normalized() );
+        
+		var cs = (this._rotation.xBasis.x + this._rotation.yBasis.y + this._rotation.zBasis.z - 1.0)*0.5;
+		var angle = Math.acos(cs);
+		angle = isNaN(angle) ? 0.0 : angle;
+		
+        if(axis){
+            var rotAxis = this.rotationAxis(sinceFrame);
+            angle *= rotAxis.dot(axis.normalized());
         }
+		
+		return angle;
 	},
 	
 	rotationAxis : function(sinceFrame){

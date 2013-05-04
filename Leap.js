@@ -511,12 +511,18 @@ Leap.Frame.prototype = {
 	},
 	
 	rotationAngle : function(sinceFrame, axis){
-		// TODO: implement axis parameter
-		if (!this._valid || !sinceFrame._valid) return 0.0;
-		var rot = this.rotationMatrix(sinceFrame);
-		var cs = (rot.xBasis.x + rot.yBasis.y + rot.zBasis.z - 1.0)*0.5
+        if (!this._valid || !sinceFrame._valid) return 0.0;
+        
+		var cs = (this._rotation.xBasis.x + this._rotation.yBasis.y + this._rotation.zBasis.z - 1.0)*0.5;
 		var angle = Math.acos(cs);
-		return isNaN(angle) ? 0.0 : angle;
+		angle = isNaN(angle) ? 0.0 : angle;
+		
+        if(axis){
+            var rotAxis = this.rotationAxis(sinceFrame);
+            angle *= rotAxis.dot(axis.normalized());
+        }
+		
+		return angle;
 	},
 	
 	rotationAxis : function(sinceFrame){
@@ -864,15 +870,21 @@ Leap.Hand.prototype = {
 	},
 	
 	rotationAngle : function(sinceFrame, axis){
-		// TODO: implement axis parameter
 		if (!this._valid || !sinceFrame._valid) return 0.0;
 		var sinceHand = sinceFrame.hand(this._id);
-		if(!sinceHand._valid) return 0.0;
+        if(!sinceHand._valid) return 0.0;
 		
 		var rot = this.rotationMatrix(sinceFrame);
-		var cs = (rot.xBasis.x + rot.yBasis.y + rot.zBasis.z - 1.0)*0.5
+		var cs = (rot.xBasis.x + rot.yBasis.y + rot.zBasis.z - 1.0)*0.5;
 		var angle = Math.acos(cs);
-		return isNaN(angle) ? 0.0 : angle;
+		angle = isNaN(angle) ? 0.0 : angle;
+		
+        if(axis){
+            var rotAxis = this.rotationAxis(sinceFrame);
+            angle *= rotAxis.dot(axis.normalized());
+        }
+		
+		return angle;
 	},
 	
 	rotationAxis : function(sinceFrame){
