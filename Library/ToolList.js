@@ -1,3 +1,3 @@
 Leap.ToolList = function(){};
 
-Leap.ToolList.prototype = Leap._List.prototype;
+Leap.ToolList.prototype = new Leap.PointableList;

@@ -1,3 +1,3 @@
 Leap.HandList = function(){};
 
-Leap.HandList.prototype = Leap._List.prototype;
+Leap.HandList.prototype = new Leap.List;

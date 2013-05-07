@@ -1,3 +1,3 @@
 Leap.GestureList = function(){};
 
-Leap.GestureList.prototype = Leap._List.prototype;
+Leap.GestureList.prototype = new Leap.List;

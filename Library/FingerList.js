@@ -1,3 +1,3 @@
 Leap.FingerList = function(){};
 
-Leap.FingerList.prototype = Leap._List.prototype;
+Leap.FingerList.prototype = new Leap.PointableList;
