@@ -750,6 +750,8 @@ Leap.CircleGesture = function(gestureData, frame){
 	this._pointable = this._pointables[0];
 	this._progress = gestureData.progress;
 	this._radius = gestureData.radius;
+	this._center = new Leap.Vector(gestureData.center);
+	this._clockwise = (this._pointable.direction().angleTo(this._normal) <= Math.PI / 4);
 };
 
 Leap.CircleGesture.prototype = Leap.Gesture.prototype;
@@ -757,6 +759,8 @@ Leap.CircleGesture.prototype.normal = function(){ return this._normal; };
 Leap.CircleGesture.prototype.pointable = function(){ return this._pointable; };
 Leap.CircleGesture.prototype.progress = function(){ return this._progress; };
 Leap.CircleGesture.prototype.radius = function(){ return this._radius; };
+Leap.CircleGesture.prototype.center = function(){ return this._center; };
+Leap.CircleGesture.prototype.isClockwise = function(){ return this._clockwise; };
 
 /* KeyTapGesture */
 Leap.KeyTapGesture = function(gestureData, frame){
