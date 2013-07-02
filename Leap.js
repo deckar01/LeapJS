@@ -313,6 +313,9 @@ Leap.Controller = function(connection){
 	
 	this._gesturesActive = false;
 	this._gesturesAllowed = {};
+
+	this._heartbeatActive = false;
+	this._heartbeat = null;
 	
 	for(var index = 0; index < this._bufferSize; index++) this._frames[index] = Leap.Frame.invalid();
 	
@@ -382,6 +385,36 @@ Leap.Controller.prototype = {
 	isGestureEnabled : function(type){
 		return this._gesturesAllowed[type]?true:false;
 	},
+
+	_INTERVAL : 100,
+
+	enableHeartbeat : function(){
+
+		if(this._heartbeat === null){
+			this._heartbeatActive = true;
+
+			var me = this;
+			if(this.isConnected()) this._heartbeat = setInterval(function(){ me._beat(); }, this._INTERVAL);
+		}
+	},
+
+	disableHeartbeat : function(){
+
+		if(this._heartbeat !== null){
+			this._heartbeatActive = false;
+
+			clearInterval(this._heartbeat);
+			this._heartbeat = null;
+		}
+	},
+
+	isHeartbeatEnabled : function(){
+		return this._heartbeatActive;
+	},
+
+	_beat : function(){
+		this._socket.send('{"heartbeat":true}');
+	},
 	
 	_onmessage : function(event){
 		
@@ -422,12 +455,17 @@ Leap.Controller.prototype = {
 		this._socket.onopen = function(event){
 			this.connected = true;
 			if(this._controller._gesturesActive) this.send('{"enableGestures": true}');
+			if(this._controller._heartbeatActive) this.enableHeartbeat();
 			for(index in this._controller._listeners)
 				this._controller._listeners[index].onConnect(this._controller);
 		};
 		
 		this._socket.onclose = function(event){
 			this.connected = false;
+			if(this._heartbeat !== null){
+				clearInterval(this._heartbeat);
+				this._heartbeat = null;
+			}
 			for(index in this._controller._listeners)
 				this._controller._listeners[index].onDisconnect(this._controller);
 			var me = this;
