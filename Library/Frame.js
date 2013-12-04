@@ -126,7 +126,7 @@ Leap.Frame.prototype = {
 	},
 	
 	translation : function(sinceFrame){
-		if (!this.valid || !sinceFrame.valid) return Leap.Vector.zero();
+		if (!this._valid || !sinceFrame._valid) return Leap.Vector.zero();
 		var x = this._translation.x - sinceFrame._translation.x;
 		var y = this._translation.y - sinceFrame._translation.y;
 		var z = this._translation.z - sinceFrame._translation.z;
